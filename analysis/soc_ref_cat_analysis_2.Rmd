@@ -16,9 +16,9 @@ library(tidyverse)
 library(stringr)
 library(magrittr)
 
-example_file <- "C:/Users/demay/Desktop/soc_ref_cat/analysis/raw_data/020218_01-eye_data Samples.txt"
+example_file <- "raw_data/020218_01-eye_data Samples.txt"
 
-example_trial_file <- "C:/Users/demay/Desktop/soc_ref_cat/analysis/trial_data/020218_01.csv"
+example_trial_file <- "trial_data/020218_01.csv"
 
 demographics_sheet <- "soc_ref_cat_demo_final.csv"
 
