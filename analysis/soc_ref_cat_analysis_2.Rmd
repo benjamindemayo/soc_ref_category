@@ -34,7 +34,7 @@ demographics <- read_csv(demographics_sheet)
 
 trial_key <- read_csv(key)
 
-d.trials <- data.frame()
+d_trials <- data_frame()
 files <- dir("trial_data")
 
 for (f in files) {
@@ -68,7 +68,7 @@ for (f in files) {
       trial_key, 
       by = c("trial" = "Trial", "condition" = "Condition")
     )
-  d.trials <- bind_rows(d.trials, id)
+  d_trials <- bind_rows(d_trials, id)
   
 }
 ```
@@ -146,7 +146,7 @@ raw.data.path <- "raw_data/"
 processed.data.path <- "processed_data/"
 
 ## LOOP TO READ IN FILES
-all.data <- data.frame()
+all_data <- data_frame()
 files <- dir(raw.data.path,pattern = "*.txt")
 
 to.n <- function(x) {as.numeric(as.character(x))}
@@ -163,118 +163,32 @@ for (file.name in files) {
 
   ## these are the two functions that are most meaningful
   d <- read.smi.idf(str_c(raw.data.path, file.name, sep = ""))
-  d <- 
-    preprocess.data(d, x.max = 1920, y.max = 1080, samp.rate = 30) 
+  d <- preprocess.data(d, x.max = 1920, y.max = 1080, samp.rate = 30) 
   
   calibration_time <- d$t[nrow(d)] - exp_trials$webcam_length[1]
-  
-  d <-
-    d %>% 
+
+  d %<>% 
     mutate(t = t - calibration_time) %>% 
     filter(t >= 0)
   
-  d <-
-    d %>%
-    mutate(trial = case_when(
-      t >= (exp_trials %>% slice(1))$onset & 
-        t <= (exp_trials %>% slice(1))$offset
-      ~ 1,
-      t >= (exp_trials %>% slice(2))$onset & 
-        t <= (exp_trials %>% slice(2))$offset
-      ~ 2,
-      t >= (exp_trials %>% slice(3))$onset & 
-        t <= (exp_trials %>% slice(3))$offset
-      ~ 3,
-      t >= (exp_trials %>% slice(4))$onset & 
-        t <= (exp_trials %>% slice(4))$offset
-      ~ 4,
-      t >= (exp_trials %>% slice(5))$onset & 
-        t <= (exp_trials %>% slice(5))$offset
-      ~ 5,
-      t >= (exp_trials %>% slice(6))$onset & 
-        t <= (exp_trials %>% slice(6))$offset
-      ~ 6,
-      t >= (exp_trials %>% slice(7))$onset & 
-        t <= (exp_trials %>% slice(7))$offset
-      ~ 7,
-      t >= (exp_trials %>% slice(8))$onset & 
-        t <= (exp_trials %>% slice(8))$offset
-      ~ 8,
-      t >= (exp_trials %>% slice(9))$onset & 
-        t <= (exp_trials %>% slice(9))$offset
-      ~ 9,
-      t >= (exp_trials %>% slice(10))$onset & 
-        t <= (exp_trials %>% slice(10))$offset
-      ~ 10,
-      t >= (exp_trials %>% slice(11))$onset & 
-        t <= (exp_trials %>% slice(11))$offset
-      ~ 11,
-      t >= (exp_trials %>% slice(12))$onset & 
-        t <= (exp_trials %>% slice(12))$offset
-      ~ 12,
-      t >= (exp_trials %>% slice(13))$onset & 
-        t <= (exp_trials %>% slice(13))$offset
-      ~ 13,
-      t >= (exp_trials %>% slice(14))$onset & 
-        t <= (exp_trials %>% slice(14))$offset
-      ~ 14,
-      t >= (exp_trials %>% slice(15))$onset & 
-        t <= (exp_trials %>% slice(15))$offset
-      ~ 15,
-      t >= (exp_trials %>% slice(16))$onset & 
-        t <= (exp_trials %>% slice(16))$offset
-      ~ 16,
-      t >= (exp_trials %>% slice(17))$onset & 
-        t <= (exp_trials %>% slice(17))$offset
-      ~ 17,
-      t >= (exp_trials %>% slice(18))$onset & 
-        t <= (exp_trials %>% slice(18))$offset
-      ~ 18,
-      t >= (exp_trials %>% slice(19))$onset & 
-        t <= (exp_trials %>% slice(19))$offset
-      ~ 19,
-      t >= (exp_trials %>% slice(20))$onset & 
-        t <= (exp_trials %>% slice(20))$offset
-      ~ 20,
-      t >= (exp_trials %>% slice(21))$onset & 
-        t <= (exp_trials %>% slice(21))$offset
-      ~ 21,
-      t >= (exp_trials %>% slice(22))$onset & 
-        t <= (exp_trials %>% slice(22))$offset
-      ~ 22,
-      t >= (exp_trials %>% slice(23))$onset & 
-        t <= (exp_trials %>% slice(23))$offset
-      ~ 23,
-      t >= (exp_trials %>% slice(24))$onset & 
-        t <= (exp_trials %>% slice(24))$offset
-      ~ 24,
-      t >= (exp_trials %>% slice(25))$onset & 
-        t <= (exp_trials %>% slice(25))$offset
-      ~ 25,
-      t >= (exp_trials %>% slice(26))$onset & 
-        t <= (exp_trials %>% slice(26))$offset
-      ~ 26,
-      t >= (exp_trials %>% slice(27))$onset & 
-        t <= (exp_trials %>% slice(27))$offset
-      ~ 27,
-      t >= (exp_trials %>% slice(28))$onset & 
-        t <= (exp_trials %>% slice(28))$offset
-      ~ 28
-    )) %>% 
-    left_join(
-      d.trials %>% select(SID, trial, Morph),
-      by = c("sid" = "SID", "trial")
-    )
-  
+  d_trial <- exp_trials %>%
+    split(.$trial) %>%
+    map_df(function(trial_row) {
+      this_trial <- filter(d, t >= trial_row$onset, t < trial_row$offset) %>%
+        mutate(trial = trial_row$trial) %>%
+        left_join(trial_row)
+      
+      return(this_trial)
+    })
   
   ## now here's where data get bound togetherq
-  all.data <- bind_rows(all.data, d)
+  all_data <- bind_rows(all_data, d_trial)
 }
 
-write_csv(all.data, path = paste0(processed.data.path, "socref_cat_data.csv"))
+write_csv(all_data, path = paste0(processed.data.path, "socref_cat_data.csv"))
 ```
 
-```{r fig.height=10}
+```{r }
 ggplot(all.data, aes(x = t, y = y)) +
   geom_point(alpha = 0.3) +
   facet_wrap(~ trial, scales = "free_x")
