@@ -53,7 +53,8 @@ for (f in files) {
       SID = subj_id, 
       trial = jd$Trial.Number,  
       onset = jd$Trial.onset / 1000,  
-      offset = jd$Trial.offset / 1000
+      offset = jd$Trial.offset / 1000,
+      chosen_side = jd$Trial.side
     ) %>%
     mutate(
       camera_onset = jd$camera.onset[1] / 1000,
@@ -63,11 +64,13 @@ for (f in files) {
       onset = onset + camera_lag,
       offset = offset + camera_lag,
       condition = condition
+      
     ) %>% 
     left_join(
       trial_key, 
       by = c("trial" = "Trial", "condition" = "Condition")
-    )
+    ) %>% 
+    mutate(accuracy = chosen_side == correct_side)
   d_trials <- bind_rows(d_trials, id)
   
 }
@@ -156,7 +159,7 @@ for (file.name in files) {
   ## print file name, so if loop breaks, we know where
   print(file.name)
   exp_trials <-
-    d.trials %>%
+    d_trials %>%
     filter(SID == str_extract(file.name, "\\d{6}_\\d{2}"))
   
   print(exp_trials)
@@ -171,7 +174,8 @@ for (file.name in files) {
     mutate(t = t - calibration_time) %>% 
     filter(t >= 0)
   
-  d_trial <- exp_trials %>%
+  d_trial <- 
+    exp_trials %>%
     split(.$trial) %>%
     map_df(function(trial_row) {
       this_trial <- filter(d, t >= trial_row$onset, t < trial_row$offset) %>%
@@ -189,12 +193,12 @@ write_csv(all_data, path = paste0(processed.data.path, "socref_cat_data.csv"))
 ```
 
 ```{r }
-ggplot(all.data, aes(x = t, y = y)) +
+ggplot(all_data, aes(x = t, y = y)) +
   geom_point(alpha = 0.3) +
   facet_wrap(~ trial, scales = "free_x")
 
 trial_proportions <- 
-  all.data %>% 
+  all_data %>% 
   filter(!is.na(trial)) %>% 
   group_by(sid, trial) %>% 
   mutate(
@@ -218,7 +222,44 @@ morph_proportions <-
 morph_proportions %>% 
   ggplot(aes(as.factor(Morph), mean_prop_looking)) +
   geom_col()
+
+trial_lengths <- 
+  all_data %>% 
+  mutate(trial_length = offset - onset) %>% 
+  group_by(sid, trial) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  group_by(Morph) %>% 
+  summarize(mean_length = mean(trial_length))
+
+trial_lengths %>% 
+  ggplot(aes(as.factor(`Morph`), mean_length)) +
+  geom_col()
+
+accuracy_ci <- 
+  all_data %>% 
+  group_by(sid, trial) %>% 
+  slice(1) %>% 
+  select(sid, trial, Morph, accuracy) %>% 
+  ungroup() %>% 
+  group_by(Morph) %>% 
+  multi_boot_standard(col = "accuracy") %>% 
+  filter(`Morph` != 50)
+
+accuracy_ci %>% 
+  ggplot(aes(as.factor(`Morph`), mean)) +
+  geom_col() +
+  geom_linerange(aes(ymin = ci_lower, ymax = ci_upper)) +
+  labs(
+    x = "Morph",
+    y = "Accuracy"
+  ) +
+  ggthemes::theme_few() 
   
+
+
+  
+    
   
   
 
@@ -236,7 +277,7 @@ d %>%
 
 ```{r}
 trial_proportions <- 
-  all.data %>% 
+  all_data %>% 
   filter(!is.na(trial)) %>% 
   group_by(sid, trial) %>% 
   mutate(
@@ -281,8 +322,30 @@ morph_proportions_per_subject %>%
   scale_y_continuous(labels = scales::percent) +
   facet_wrap(~ sid)
 
+morph_proportions_per_subject %>% 
+  ggplot(aes(`Morph`, mean_prop_looking)) +
+  geom_point() +
+  labs(
+    x = "Morph",
+    y = "Mean percentage of trial looking"
+  ) +
+  coord_cartesian(ylim = c(0, 1))
 
+accuracy_looking <- 
+  trial_proportions %>% 
+  left_join(
+    all_data %>% select(sid, trial, accuracy)
+  ) %>% 
+  group_by(sid, trial) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  group_by(accuracy) %>% 
+  multi_boot_standard(col = "prop_looking")
+
+accuracy_looking %>% 
+  ggplot(aes(accuracy, mean)) +
+  geom_col() +
+  geom_linerange(aes(ymin = ci_lower, ymax = ci_upper))
   
   
-```
 
