@@ -70,7 +70,11 @@ for (f in files) {
       trial_key, 
       by = c("trial" = "Trial", "condition" = "Condition")
     ) %>% 
-    mutate(accuracy = chosen_side == correct_side)
+    mutate(accuracy = chosen_side == correct_side) %>% 
+    left_join(
+      demographics %>% select(SID, age),
+      by = "SID"
+    )
   d_trials <- bind_rows(d_trials, id)
   
 }
@@ -209,8 +213,13 @@ trial_proportions <-
     look ~ "looking",
     !look ~ "not_looking"
   )) %>% 
+  ungroup() %>% 
   count(sid, trial, look, Morph) %>% 
-  spread(look, n) %>% 
+  spread(look, n) %>%
+  left_join(
+    demographics %>% select(SID, age),
+    by = c("sid" = "SID")
+  ) %>% 
   replace_na(list(looking = 0, not_looking = 0)) %>% 
   mutate(prop_looking = looking / (looking + not_looking))
 
@@ -288,8 +297,10 @@ trial_proportions <-
     look_captured ~ "looking",
     !look_captured ~ "not_looking"
   )) %>% 
+  ungroup() %>% 
   count(sid, trial, look, Morph) %>% 
   spread(look, n) %>% 
+  
   replace_na(list(looking = 0, not_looking = 0)) %>% 
   mutate(prop_looking = looking / (looking + not_looking))
 
@@ -346,6 +357,28 @@ accuracy_looking %>%
   ggplot(aes(accuracy, mean)) +
   geom_col() +
   geom_linerange(aes(ymin = ci_lower, ymax = ci_upper))
+```
+
+```{r}
+
+lmer_data <- 
+  trial_proportions %>% 
+  rename(morph = Morph) %>% 
+  mutate(
+    morph = factor(morph),
+    trial = factor(trial),
+    age_c = as.numeric(langcog::scale(age, scale = FALSE))
+  )
   
+maximal_mod <- 
+  lme4::lmer(
+    prop_looking ~ morph * age + 
+      (morph | sid) + (1 | trial),
+    data = lmer_data, REML = FALSE
+  )
   
+g_lm <-summary(maximal_mod)
+
+g_lm
+```
 
