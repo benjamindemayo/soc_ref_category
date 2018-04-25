@@ -20,7 +20,7 @@ example_file <- "raw_data/020218_01-eye_data Samples.txt"
 
 example_trial_file <- "trial_data/020218_01.csv"
 
-demographics_sheet <- "soc_ref_cat_demo_final.csv"
+demographics_sheet <- "soc_ref_cat_demo_github.csv"
 
 key <- "trial_morphs.csv"
 ```
@@ -70,7 +70,12 @@ for (f in files) {
       trial_key, 
       by = c("trial" = "Trial", "condition" = "Condition")
     ) %>% 
-    mutate(accuracy = chosen_side == correct_side) %>% 
+    mutate(
+      accuracy = case_when(
+        correct_side == "M" ~ NA,
+        correct_side != "M" ~ correct_side == chosen_side
+      )
+    ) %>% 
     left_join(
       demographics %>% select(SID, age),
       by = "SID"
@@ -196,7 +201,88 @@ for (file.name in files) {
 write_csv(all_data, path = paste0(processed.data.path, "socref_cat_data.csv"))
 ```
 
+```{r}
+#Accuracy checks
+
+
+d_trials_block <- 
+  d_trials %>% 
+  mutate(
+    block = case_when(
+      1 <= trial & trial <= 7 ~ 1,
+      8 <= trial & trial <= 14 ~ 2,
+      15 <= trial & trial <= 21 ~ 3,
+      22 <= trial & trial <= 28 ~ 4
+    )
+  )
+
+d_accuracy_morph <- 
+  d_trials_block %>%
+  filter(Morph != 50) %>% 
+  group_by(SID, Morph) %>% 
+  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
+  group_by(Morph) %>% 
+  multi_boot_standard(col = "accuracy") %>% 
+  ungroup()
+
+d_accuracy_morph %>% 
+  ggplot(aes(x = Morph, y = mean)) + 
+  geom_line(size = .5) + 
+  geom_pointrange(aes(ymin = ci_lower, ymax = ci_upper)) +
+  geom_hline(yintercept = .5, lty = 2) + 
+  ylim(0,1) + 
+  ylab("Proportion Accurate") + 
+  xlab("Morph level") + 
+  ggthemes::theme_few() +
+  scale_x_continuous(breaks = c(60, 70, 100))
+
+d_accuracy_block_morph <- 
+  d_trials_block %>% 
+  filter(Morph != 50) %>% 
+  group_by(SID, Morph, block) %>% 
+  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
+  group_by(Morph, block) %>% 
+  multi_boot_standard(col = "accuracy") %>% 
+  ungroup()
+
+d_accuracy_block_morph %>% 
+  ggplot(aes(
+    x = Morph, 
+    y = mean, 
+    col = factor(block), 
+    group = factor(block)
+  )) + 
+  geom_line() + 
+  geom_pointrange(aes(ymin = ci_lower, ymax = ci_upper), 
+                  position = position_dodge(width = 4)) + #preserve vertical position while adjusting horizontal (ease of visual understanding)
+  geom_hline(yintercept = .5, lty = 2) + 
+  ylim(0,1) + 
+  ylab("Proportion Accurate") + 
+  xlab("Morph level") + 
+  scale_colour_solarized(name = "block") + 
+  ggthemes::theme_few() +
+  scale_x_continuous(breaks = c(60, 70, 100))
+
+d_accuracy_block <- 
+  d_trials_block %>% 
+  filter(!is.na(accuracy)) %>% 
+  group_by(SID, block) %>% 
+  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  group_by(block) %>% 
+  multi_boot_standard(col = "accuracy") %>% 
+  ungroup()
+
+d_accuracy_block %>% 
+  ggplot(aes(block, mean)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  theme_minimal()
+```
+
+
 ```{r }
+
 ggplot(all_data, aes(x = t, y = y)) +
   geom_point(alpha = 0.3) +
   facet_wrap(~ trial, scales = "free_x")
@@ -353,10 +439,7 @@ accuracy_looking <-
   group_by(accuracy) %>% 
   multi_boot_standard(col = "prop_looking")
 
-accuracy_looking %>% 
-  ggplot(aes(accuracy, mean)) +
-  geom_col() +
-  geom_linerange(aes(ymin = ci_lower, ymax = ci_upper))
+
 ```
 
 ```{r}

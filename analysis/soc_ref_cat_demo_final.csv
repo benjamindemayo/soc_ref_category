@@ -1,9 +1,0 @@
-experimenter,location,study_name,SID,age,gender,hispanic,ethnicity,english,num_lang,parent_ed,other_ed,"premie (1=yes, 0=no)",Exclude,Video?,Condition,X side (from experimenter perspective),A first or B?,Accuracy (practice and first set),Accuracy (Second set),Comments
-Benny,Bing,soc_ref_cat,013118_01,,,,,,,,,,,,2,R,B,,,
-Benny,Bing,soc_ref_cat,020218_01,5.1,,,,,,,,,,y,2,R,B,22,,
-Benny,Bing,soc_ref_cat,020218_02,4.8,,,,,,,,,,y,2,R,B,23,,
-Benny,Bing,soc_ref_cat,020718_01,3.5,,,,,,,,,,y,1,R,B,22,,
-Benny,Bing,soc_ref_cat,020718_02,5.3,,,,,,,,,,y,2,R,B,24,,
-Benny,Bing,soc_ref_cat,020918_01,4.9,,,,,,,,,,y,1,R,A,18,,practice out of order
-Benny,Bing,soc_ref_cat,020918_02,4.6,,,,,,,,,,y,2,R,A,22,,
-Benny,Bing,soc_ref_cat,020918_03,5.0,,,,,,,,,,n,1,R,A,23,,
