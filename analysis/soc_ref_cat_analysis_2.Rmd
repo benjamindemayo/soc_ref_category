@@ -417,6 +417,8 @@ d %>%
 
 
 ```{r}
+#Visualizing looking behavior across different morph levels.
+
 trial_proportions <- 
   all_data %>% 
   filter(!is.na(trial)) %>% 
@@ -439,6 +441,22 @@ trial_proportions <-
   
   replace_na(list(looking = 0, not_looking = 0)) %>% 
   mutate(prop_looking = looking / (looking + not_looking))
+
+trial_lengths <-  
+  d_trials %>% 
+  mutate(length = offset - onset) %>% 
+  filter(length > 0) %>% 
+  arrange(length)
+
+trial_lengths %>% 
+  ggplot(aes(as.factor(Morph), length)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 15)) +
+  ggthemes::theme_few()
+
+
+
+
 
 morph_proportions <- 
   trial_proportions %>% 
@@ -512,7 +530,7 @@ lmer_data <-
   
 maximal_mod <- 
   lmerTest::lmer(
-    prop_looking ~ morph * age_c + 
+    prop_looking ~ morph * age + 
       (morph | sid) + (1 | trial),
     data = lmer_data, REML = FALSE
   )
