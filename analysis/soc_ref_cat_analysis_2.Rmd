@@ -29,21 +29,9 @@ key <- "trial_morphs.csv"
 Preliminaries.
 
 ```{r}
-#read in trial data.
+# Read in trial data.
 
 demographics <- read_csv(demographics_sheet)
-
-# example_f <- 
-#   read_csv(example_trial_file)
-# 
-# condition_test <- 
-#   demographics %>% 
-#   filter(SID == "020218_01") %>% 
-#   pull(Condition)
-# 
-# condition_test
-
-
 include <- 
   demographics %>% 
   filter(Exclude == "n") 
@@ -522,6 +510,54 @@ accuracy_looking <-
 
 ```
 
+
+```{r}
+#Visualizing looking proportion by accuracy
+
+accuracy_proportions <- 
+  all_data %>% 
+  filter(!is.na(trial) & !is.na(accuracy)) %>%
+  group_by(sid, trial) %>% 
+   mutate(
+    trial_length = max(t) - min(t),
+    look_captured = !is.na(x) | !is.na(y)
+  ) %>% 
+  mutate(look = case_when(
+    look_captured ~ "looking",
+    !look_captured ~ "not_looking"
+  )) %>% 
+  ungroup() %>% 
+  count(sid, trial, look, accuracy) %>% 
+  spread(look, n) %>% 
+  left_join(
+    demographics %>% select(SID, age),
+    by = c("sid" = "SID")
+  ) %>%
+  replace_na(list(looking = 0, not_looking = 0)) %>% 
+  mutate(prop_looking = looking / (looking + not_looking))
+
+accuracy_proportions %>% 
+  group_by(accuracy) %>% 
+  multi_boot_standard(col = "prop_looking") %>% 
+  ungroup %>% 
+  ggplot(aes(accuracy, mean)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = "Accuracy",
+    y = "Proportion of trial looking",
+    title = "Proportion of Trial Spent\nLooking at Experimenter"
+  ) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12)
+  ) 
+
+  
+```
+
 ```{r eval=FALSE}
 
 lmer_data <- 
@@ -545,7 +581,30 @@ maximal_mod <-
 g_lm <-summary(maximal_mod)
 
 g_lm
+
+lmer_acc_data <- 
+  accuracy_proportions %>% 
+  mutate(
+    accuracy = factor(accuracy),
+    trial = factor(trial),
+    age_c = as.numeric(langcog::scale(age, scale = FALSE))
+  )
+
+maximal_mod_acc <- 
+  lmerTest::lmer(
+    prop_looking ~ accuracy * age_c + 
+      (accuracy | sid) + (1 | trial),
+    data = lmer_acc_data, REML = FALSE
+  )
+
+g_lm_acc <- summary(maximal_mod_acc)
+
+g_lm_acc
+  
 ```
+
+
+
 ```{r}
 #Trial by trial visualization
 
@@ -647,7 +706,6 @@ trial_viz_ci_backwards %>%
     x = "time before decision (seconds)",
     y = "mean proportion looking at experimenter",
     title = "Timecourse of children's referencing\nof experimenter prior to decision",
-    caption = "Child's decision occurs at time 0",
     size = "Number of trials\nrepresented"
   ) +
   scale_size_continuous(

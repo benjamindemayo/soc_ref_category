@@ -1,0 +1,37 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-6-1.pdf}
+\caption{\label{fig:unnamed-chunk-6}Categorization accuracy for each morph
+level. Error bars are 95 percent confidence intervals.}
+\end{figure*}
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-7-1.pdf}
+\caption{\label{fig:unnamed-chunk-7}Categorization accuracy for each of four
+experimental blocks, suggesting that children's accuracy did not degrade
+throughout the task. Error bars are 95 percent confidence intervals.}
+\end{figure*}
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-9-1.pdf}
+\caption{\label{fig:unnamed-chunk-9}Timecourse of proportion looking at
+experimenter, in half-second intervals. Size of points indicates amount
+of trials represented in each point. Error bars are 95 percent
+confidence intervals.}
+\end{figure*}
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+\centering
+\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-11-1.pdf}
+\caption{\label{fig:unnamed-chunk-11}Timecourse of children's looking at
+experimenter prior to decision, in half-second intervals. Size of points
+represents amount of trials included in each data point. Error bars are
+95 percent confidence intervals.}
+\end{figure*}
