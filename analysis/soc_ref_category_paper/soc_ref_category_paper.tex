@@ -1,4 +1,4 @@
-\documentclass[man]{apa6}
+\documentclass[floatsintext,man]{apa6}
 
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
@@ -39,12 +39,6 @@
   {\begin{landscape}\begin{center}\begin{ThreePartTable}}
   {\end{ThreePartTable}\end{center}\end{landscape}}
 
-  \usepackage{ifthen} % Only add declarations when endfloat package is loaded
-  \ifthenelse{\equal{\string man}{\string man}}{%
-   \DeclareDelayedFloatFlavor{ThreePartTable}{table} % Make endfloat play with longtable
-   % \DeclareDelayedFloatFlavor{ltable}{table} % Make endfloat play with lscape
-   \DeclareDelayedFloatFlavor{lltable}{table} % Make endfloat play with lscape & longtable
-  }{}%
 
 
 
@@ -614,9 +608,18 @@ two novel prototype images and using Norrkross MorphX to create a
 perceptual continuum of stimulus items that were different morph
 combinations of the two prototypes. Since pilot testing revealed that
 the current task was too easy for children when the prototypes varied in
-color, we transformed them to be monochromatic blue (Figure \#\#). The
-images were printed and laminated to make rectangular cards that
-children could insert into one of the two boxes.
+color, we transformed them to be monochromatic blue (Figure
+\ref{fig:stimuli}). The images were printed and laminated to make
+rectangular cards that children could insert into one of the two boxes.
+
+\begin{figure}
+
+{\centering \includegraphics[width=4.27in]{../images/stimuli} 
+
+}
+
+\caption{Stimulus sets provided to children. Images on the ends of the spectrums are prototypes which morph into each other an a perceptual continuum.}\label{fig:stimuli}
+\end{figure}
 
 \subsubsection{b) Experimental Setup and Eye-tracking
 Mechanism.}\label{b-experimental-setup-and-eye-tracking-mechanism.}
@@ -641,6 +644,20 @@ instead of an image on a screen. The child's field of vision was
 captured by an external-viewing webcam situated directly behind and
 slightly above the child's head.
 
+\begin{figure}
+\centering
+\includegraphics{../images/setup.jpg}
+\caption{\label{fig:setup}Experimental setup from child's perspective. The
+eye-tracker across the table recorded gaze shifts to the experimenter
+throughout the task.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{../images/calibration.jpg}
+\caption{\label{fig:calibration}Calibration images.}
+\end{figure}
+
 \subsubsection{c) Calibration.}\label{c-calibration.}
 
 Children were directed to look at each of the 5 calibration images on
@@ -648,8 +665,7 @@ the poster-boarded situated across the table from them while the
 experimenter approved each point one-by-one. The calibration display
 consisted of a large white poster board with five cartoon images (a
 smiling star, a puppy, a blue fish, a flower, and a red apple) as
-illustrated in Figure X (in the caption for the figure, explain the
-geometric configuration of the objects. After the experimenter had
+illustrated in Figure \ref{fig:calibration}. After the experimenter had
 approved each calibration point, the child was asked to follow the
 experimenter's finger as it moved across the calibration display while
 the experimenter checked to see whether the eye-tracker was accurately
@@ -688,7 +704,7 @@ reminded of the two prototype creatures at each end of the perceptual
 continuum. Pilot testing indicated that this procedure invoked
 differential levels of accuracy based on stimulus ambiguity and avoided
 performance degradation by continually re-introducing the prototypes and
-offering a motivational reward after each block of 7 trials (Figure X).
+offering a motivational reward after each block of 7 trials.
 
 \subsubsection{Analysis}\label{analysis}
 
@@ -708,38 +724,46 @@ checks}\label{procedural-and-manipulation-checks}
 
 \begin{figure}
 \centering
-\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-6-1.pdf}
-\caption{\label{fig:unnamed-chunk-6}Categorization accuracy for each morph
+\includegraphics{soc_ref_category_paper_files/figure-latex/morphaccuracy-1.pdf}
+\caption{\label{fig:morphaccuracy}Categorization accuracy for each morph
 level. Error bars are 95 percent confidence intervals.}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-7-1.pdf}
-\caption{\label{fig:unnamed-chunk-7}Categorization accuracy for each of four
+\includegraphics{soc_ref_category_paper_files/figure-latex/blockaccuracy-1.pdf}
+\caption{\label{fig:blockaccuracy}Categorization accuracy for each of four
 experimental blocks, suggesting that children's accuracy did not degrade
 throughout the task. Error bars are 95 percent confidence intervals.}
 \end{figure}
 
 To validate the manipulation of category ambiguity in my procedure, I
-first examined whether children's accuracy on the task corresponded to
-the category ambiguity of each stimulus item (Figure \#\#). Children
-were most accurate when categorizing images of morph level 100, which
-were identical to the prototype images shown as category exemplars at
-the beginning of each test block (mean accuracy = 0.84.) They were less
-accurate when categorizing images of morph level 70 (mean accuracy =
-0.72) and still less accurate when categorizing images of morph level 60
-(mean accuracy = 0.66). Thus, as was designed, the task was more
-difficult for children when they were tasked with categorizing more
-ambiguous stimuli. Children's performance on the task also seemed to
-remain consistent throughout the approximately 6 minute duration of test
-trials (Figure XX), indicating that children remained engaged and
-motivated throughout the experiment.
+first examined whether children's accuracy on the categorization task
+(i.e., whether they put each item in the correct box) corresponded to
+the category ambiguity of each stimulus item (Figure
+\ref{fig:morphaccuracy}). Evidence from pilot testing indicated that
+children's accuracy on the task was highest for the least ambiguous
+stimuli, while children were least accurate when categorizing most
+ambiguous stimuli. To confirm this finding of the effect of morph level
+on accuracy,I used the following logistic regression model, which
+accounted for random effects (such as participant and trial number):
+\texttt{accuracy\ \textasciitilde{}\ morph\ *\ centered\ age\ +\ (morph\ \textbar{}\ participant)\ +\ (1\ \textbar{}\ trial)}.
+I found a significant difference in children's accuracy on trials of
+morph level 60 and trials of morph level 100 (\(\beta\) = 1.25, \emph{p}
+\textless{} .001`). The difference in accuracy between trials of morph
+level 60 and trials of morph level 70 trended towards, but did not
+reach, significance, \(\beta\) = 0.40, \emph{p} = 0.09. These results
+demonstrate that the task was more difficult for children when they were
+tasked with categorizing more ambiguous stimuli. Children's performance
+on the task also remained consistent throughout the approximately 6
+minute duration of test trials (Figure \ref{fig:blockaccuracy}),
+indicating that children remained engaged and motivated throughout the
+experiment.
 
 \begin{figure}
 \centering
-\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-9-1.pdf}
-\caption{\label{fig:unnamed-chunk-9}Timecourse of proportion looking at
+\includegraphics{soc_ref_category_paper_files/figure-latex/forwardtimecourse-1.pdf}
+\caption{\label{fig:forwardtimecourse}Timecourse of proportion looking at
 experimenter, in half-second intervals. Size of points indicates amount
 of trials represented in each point. Error bars are 95 percent
 confidence intervals.}
@@ -748,10 +772,10 @@ confidence intervals.}
 Since this analysis method required the integration of data acquired
 from various devices, I examined the average timecourse of children's
 looking patterns during trials to ensure that data output from these
-devices was aligning appropriate. Figure \#\# shows, for each
-half-second interval after the beginning of the trial, the average
-proportion of that interval that children spent looking at the
-experimenter. Since the eye-tracking data collection method in this
+devices was aligning appropriate. Figure \ref{fig:forwardtimecourse}
+shows, for each half-second interval after the beginning of the trial,
+the average proportion of that interval that children spent looking at
+the experimenter. Since the eye-tracking data collection method in this
 paradigm was coarse, any looks captured by the eye-tracker were
 considered to be a look in the general direction of the experimenter;
 thus, the \enquote{Area of Interest} in this design was defined as the
@@ -759,29 +783,29 @@ entire spatial area for which the eye-tracker was calibrated.
 
 \begin{figure}
 \centering
-\includegraphics{soc_ref_category_paper_files/figure-latex/unnamed-chunk-11-1.pdf}
-\caption{\label{fig:unnamed-chunk-11}Timecourse of children's looking at
+\includegraphics{soc_ref_category_paper_files/figure-latex/reversetimecourse-1.pdf}
+\caption{\label{fig:reversetimecourse}Timecourse of children's looking at
 experimenter prior to decision, in half-second intervals. Size of points
 represents amount of trials included in each data point. Error bars are
 95 percent confidence intervals.}
 \end{figure}
 
-In general, Figure \#\# shows that children tend to look slightly more
-at the experimenter at the very beginning of the trial, perhaps since
-this is when they are receiving the stimulus item from the experimenter.
-As trial length increases, so does the proportion of time in each
-half-second interval that children spend looking at the experimenter,
-which may be in part because longer trials frequently featured children
-asking questions and thus making eye-contact with the experimenter.
-Figure \#\# shows the timecourse of children's looking in half-second
-intervals before the end of the trial, which corresponds to the child's
-decision to place the stimulus item in one box or another. This plot
-shows a peak in children's looking behavior approximately 2.5 - 3
-seconds before a decision, which is slightly after the beginning of the
-trial (median trial length = 3.20 seconds). Taken together, these plots
-show a plausible timecourse of children's looking throughout trials
-which lends confirmatory evidence that data from various devices was
-integrated and aligned correctly.
+In general, Figure \ref{fig:forwardtimecourse} shows that children tend
+to look slightly more at the experimenter at the very beginning of the
+trial, perhaps since this is when they are receiving the stimulus item
+from the experimenter. As trial length increases, so does the proportion
+of time in each half-second interval that children spend looking at the
+experimenter, which may be in part because longer trials frequently
+featured children asking questions and thus making eye-contact with the
+experimenter. Figure \ref{fig:reversetimecourse} shows the timecourse of
+children's looking in half-second intervals before the end of the trial,
+which corresponds to the child's decision to place the stimulus item in
+one box or another. This plot shows a peak in children's looking
+behavior approximately 2.5 - 3 seconds before a decision, which is
+slightly after the beginning of the trial (median trial length = 3.20
+seconds). Taken together, these plots show a plausible timecourse of
+children's looking throughout trials which lends confirmatory evidence
+that data from various devices was integrated and aligned correctly.
 
 \subsection{Proportion of trial looking by
 morph}\label{proportion-of-trial-looking-by-morph}
@@ -793,9 +817,200 @@ proportion of trial spent looking at the experimenter, along with any
 possible developmental trends. I ran a linear mixed-effects model with
 the following preregistered structure:
 \texttt{proportion\ of\ trial\ spent\ looking\ \textasciitilde{}\ morph\ *\ centered\ age\ +\ (morph\ \textbar{}\ participant)\ +\ (1\ \textbar{}\ trial)}.
-Random effects are denoted in parentheses.
+This model allowed me to quantify the effects of fixed factors and
+random factors, including child participants and individual stimulus
+items. Random effects are denoted in parentheses.
+
+I found no significant effects of stimulus ambiguity or children's
+centered age in months on the proportion of trial that children spent
+looking at the experimenter (all \emph{p}-values for fixed effects
+\textgreater{} 0.10), indicating that children did not selectively look
+longer at the exprimenter when faced with making a more uncertain
+decision.
+
+\begin{figure}
+\centering
+\includegraphics{soc_ref_category_paper_files/figure-latex/morphlooking-1.pdf}
+\caption{\label{fig:morphlooking}Proportion of trial time spent looking at
+experimenter by morph level. Error bars are 95 percent confidence
+intervals.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{soc_ref_category_paper_files/figure-latex/accuracylooking-1.pdf}
+\caption{\label{fig:accuracylooking}Proportion of trials spent looking at
+experimenter by children's category accuracy. Error bars are 95 percent
+confidence intervals.}
+\end{figure}
+
+\subsection{Proportion of trial looking by task
+accuracy}\label{proportion-of-trial-looking-by-task-accuracy}
+
+I also examined whether children's accuracy on the task had an effect on
+the proportion of trials spent looking at the experimenter (Figure
+\ref{fig:accuracylooking}). To answer this question, I used a linear
+mixed-effects model with the following structure, with random effects
+denoted in parentheses:
+\texttt{proportion\ of\ trial\ spent\ looking\ \textasciitilde{}\ accuracy\ *\ centered\ age\ +\ (accuracy\ \textbar{}\ participant)\ +\ (1\ \textbar{}\ trial)}.
+I found no effect of accuracy on proportion of trials spent looking at
+the experimenter (\emph{p} = 0.31), indicating that children did not
+look at the experimenter more on trials when they were inaccurate versus
+inaccurate.
 
 \section{Discussion}\label{discussion}
+
+In this study, I set out to understand whether children are sensitive to
+graded levels of uncertainty, and whether they would adjust their
+social-information seeking on the basis of this uncertainty. Previous
+research had suggested that children explore environments in order to
+maximize their learning about the world (Schulz \& Bonawitz, 2007), that
+they have a limited but emerging capacity to monitor epistemic states
+and uncertainty (Coughlin et al., 2015; Hembacher \& Ghetti, 2014), and
+that they selectively seek out information from people who they deem to
+be knowledgeable and helpful in the immediate learning context (Kushnir,
+Vredenburgh, \& Schneider, 2013; Vredenburgh \& Kushnir, 2016).
+Empirical evidence also suggested that children may possess some
+sensitivity to graded evidence and intermediate levels of uncerainty in
+the environment, in such contexts as \enquote{partial exposure} tasks
+(Call \& Carpenter, 2001; Kloo et al., 2017) and word learning
+situations (Hembacher \& Frank, n.d.). Thus, I hypothesized that
+children would show a looking pattern that would indicate sensitivity to
+graded uncertainty, and would selectively seek more social information
+on trials in which they were tasked with categorizing more ambiguous
+stimuli.
+
+Contrary to my hypothesis, I found that children did not differentiate
+between trials of different morph levels in their levels of looking. A
+linear mixed-effects model demonstrated that stimlus ambiguity had no
+effect at any level of ambiguity on the proportion of each trial that
+children spent looking at the experimenter. Thus the data do not
+explicitly show that children possess sensitivity to graded levels of
+uncertainty, nor do they show that children strategically adjust the
+amount of social information they seek out on the basis of subjective
+uncertainty. Interestingly, I found no difference in looking behaviors
+even between trials which were completely ambiguous (morph level 50) and
+trials which were identical to the prototypes shown to children at the
+beginning of each experimental block (morph level 100). This result is
+particularly striking given that children were significantly less
+accurate in categorizing more ambiguous items, indicating that task
+difficulty was not uniform across trials. This finding contrasts that of
+Hembacher, deMayo, and Frank (n.d.), who found that, in a word-learning
+task, children's social information gathering was closely linked to
+referential ambiguity. What might be the origin of the discrepancy
+between these two findings?
+
+One possibility is that this task, even during the most unambiguous
+trials, was more challenging for children, since the task required
+keeping the protoype images and their correct locations in memory. Thus,
+even though children's differential levels of accuracy on the various
+trial types indicate that the task was not uniformly difficult across
+all trials, it may have been too demanding throughout all the trials to
+be able to invoke a pattern of differential looking. Another possibility
+is that the task proceeded too swiftly to facilitate children's looking
+at the experimenter during individual trials. Other studies that have
+measured children's visual solicitations for social information (e.g.,
+Vaish et al., 2011) have measured children's looking patterns over
+longer spans of time, whereas my design measured children's looking
+patterns during trials that had a median length of 3.20 seconds. Below,
+I discuss methodological limitations of the current work that may have
+impacted my ability to detect an effect of graded category ambiguity on
+children's social information-gathering.
+
+\subsection{Limitations}\label{limitations}
+
+The current work has several limitations that should encourage caution
+against interpreting this null result as an indication of children's
+inability to monitor graded levels of category uncertainty and seek out
+social information accordingly. First and foremost, my data collection
+method -- the use of an eye-tracker to measure children's gaze patterns
+in a live person-to-person interaction -- provided coarse data. This
+type of eye-tracking method is challenging to execute because it
+requires children to be very still during an extended calibration phase,
+and is particularly sensitive to children's body movements and any small
+fluctuations in the experimental setup. Future work should strive for
+greater precision from this type of data-collection method. Furthermore,
+as mentioned above, this task moved quickly; a task that proceeds a
+slower pace may be optimize the researcher's ability to detect an effect
+of category ambiguity on children's social gaze patterns.
+
+Additionally, it is not possible to know with complete certainty what
+type of information children were seeking or expecting when they shifted
+their gaze to the experimenter. We operate under the assumption that
+children's foremost reason for looking was a search for disambiguating
+information, but children may also have looked at the experimenter
+because they were expecting a certain action (i.e., being handed the
+next item in the game), asking a question unrelated to their own
+uncertainty, or were simply compelled to look at their social partner
+because faces are interesting to look at.
+
+Finally, this study was performed with a convenience sample of children
+from a preschool in an upper-middle/upper class neighborhood consisting
+of mostly white and Asian families. Since this sample is not
+demographically representative of the broader population, it is possible
+that some of the eye-gaze patterns I observed were sample-specific,
+given that eye contact between social partners has been shown to be
+modulated by cultural norms (Akechi et al. (2013)). Nevertheless, the
+preschool from which I recruited this sample makes a concerted effort to
+reach out to underrepresented families in order to maintain a diverse
+classroom environment.
+
+\subsection{Conclusion and Future
+Work}\label{conclusion-and-future-work}
+
+The results of the current study do not provide a conclusive answer to
+the question I posed at the outset of whether children are sensitive to
+graded levels of uncertainty and adjust their social
+information-gathering according to this uncertainty. Contrary to my
+initial hypothesis, children did not show differential levels of looking
+to the experimenter when categorizing items whose category ambiguity
+varied along a spectrum. However, this could have been a task-specific
+result given the pace and difficulty of the procedure children were
+being asked to complete. Future work can improve on this design by
+allowing for a larger temporal observation window through which to gauge
+children's social-information gathering, removing some of the memory
+demands present throughout this task to exagerrate the difference
+between \enquote{difficult} and \enquote{easy} trial items, and by
+implementing a method of tracking gaze to a social partner in a more
+precise manner than what was achieved here.
+
+In sum, the current work illustrates that, in a category-discrimination
+context, children do not show obvious signs of adjusting their
+social-information gathering behaviors on the basis of graded
+uncertainty. However, the possibility still exists that children do
+possess a sensitivity to intermediate levels of category ambiguity, and
+would show this sensitivity in different contexts. This study therefore
+provides a theoretical and methodological framework from which other
+researchers can expand in order to better understand the development of
+children's uncertainty monitoring and social information-seeking in
+early childhood.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\section{Acknowledgements}\label{acknowledgements}
+
+First and foremost, thanks to my advisors in the Stanford Department of
+Psychology, Emily Hembacher and Mike Frank. They have invested so much
+time, patience and energy in my personal and intellectual growth, and I
+appreciate it deeply.
+
+Thanks to my participants and their families from the Bing Nursery
+School (Stanford, CA) and the Children's Discovery Museum (San Jose,
+CA). Special thanks also to the Bing Nursery School teaching staff and
+administration: Chia-wa Yeh, Beth Wise, Jennifer Winters, Nandini
+Bhattacharjya, Jenna Rist, Nikki Baumgart, Sadie Parrinello, Jessica
+Barajas, Seleena Vinayraj, Maryam Saqib, Todd Erickson, Vanessa Ibarra,
+Andrea Fewster, Liz Prives, Kathryn Carruthers, and Frannie McCarthy.
+
+Thanks to Danielle Kellier for providing helpful technical support,
+advice and troubleshooting, and to Grace Bennett-Pierre and Mika Asaba
+from the Social Learning Lab at Stanford for lending materials.
+
+Lastly, a warm thanks to my parents Bob and Celia and brother Jimmy for
+supporting me through all of the challenges this project has brought.
+
+This work was funded by a Major Grant from Stanford Undergraduate
+Advising and Research (UAR).
 
 \newpage
 
@@ -804,6 +1019,11 @@ Random effects are denoted in parentheses.
 \setlength{\parindent}{-0.5in} \setlength{\leftskip}{0.5in}
 
 \hypertarget{refs}{}
+\hypertarget{ref-akechi2013attention}{}
+Akechi, H., Senju, A., Uibo, H., Kikuchi, Y., Hasegawa, T., \& Hietanen,
+J. K. (2013). Attention to eye contact in the west and east: Autonomic
+responses and evaluative ratings. \emph{PLoS One}, \emph{8}(3), e59312.
+
 \hypertarget{ref-call2001apes}{}
 Call, J., \& Carpenter, M. (2001). Do apes and children know what they
 have seen? \emph{Animal Cognition}, \emph{3}(4), 207--220.
@@ -902,6 +1122,12 @@ Psychology}, \emph{159}, 279--295.
 Koenig, M. A., Clément, F., \& Harris, P. L. (2004). Trust in testimony:
 Children's use of true and false statements. \emph{Psychological
 Science}, \emph{15}(10), 694--698.
+
+\hypertarget{ref-kushnir2013can}{}
+Kushnir, T., Vredenburgh, C., \& Schneider, L. A. (2013). ``Who can help
+me fix this toy?'' the distinction between causal knowledge and word
+knowledge guides preschoolers' selective requests for information.
+\emph{Developmental Psychology}, \emph{49}(3), 446.
 
 \hypertarget{ref-laidlaw2011potential}{}
 Laidlaw, K. E., Foulsham, T., Kuhn, G., \& Kingstone, A. (2011).

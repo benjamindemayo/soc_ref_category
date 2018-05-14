@@ -224,7 +224,6 @@ write_csv(all_data, path = paste0(processed.data.path, "socref_cat_data.csv"))
 ```{r}
 #Accuracy checks
 
-
 d_trials_block <- 
   d_trials %>% 
   mutate(
@@ -316,7 +315,6 @@ d_accuracy_block %>%
     y = "Mean Accuracy",
     title = "Mean Accuracy by Test Block"
   ) +
-  scale_y_continuous(labels = scales::percent) +
   ggthemes::theme_few() +
   theme(
     plot.title = element_text(hjust = 0.5, size = 18),
@@ -722,10 +720,10 @@ trial_viz_ci_backwards %>%
   ) 
 
 
-mean_trial_length <- 
+median_trial_length <- 
   d_trials %>% 
   mutate(trial_length = offset - onset) %>% 
   filter(trial_length > 0) %>% 
-  summarise(mean = mean(trial_length))
+  summarise(median = median(trial_length))
 ```
 

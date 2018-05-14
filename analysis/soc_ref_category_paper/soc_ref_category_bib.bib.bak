@@ -559,4 +559,26 @@
   publisher = {Wiley Online Library},
 }
 
+@Article{kushnir2013can,
+  author    = {Kushnir, Tamar and Vredenburgh, Christopher and Schneider, Lauren A},
+  title     = {“Who can help me fix this toy?” The distinction between causal knowledge and word knowledge guides preschoolers' selective requests for information.},
+  journal   = {Developmental psychology},
+  year      = {2013},
+  volume    = {49},
+  number    = {3},
+  pages     = {446},
+  publisher = {American Psychological Association},
+}
+
+@Article{akechi2013attention,
+  author    = {Akechi, Hironori and Senju, Atsushi and Uibo, Helen and Kikuchi, Yukiko and Hasegawa, Toshikazu and Hietanen, Jari K},
+  title     = {Attention to eye contact in the West and East: autonomic responses and evaluative ratings},
+  journal   = {PLoS One},
+  year      = {2013},
+  volume    = {8},
+  number    = {3},
+  pages     = {e59312},
+  publisher = {Public Library of Science},
+}
+
 @Comment{jabref-meta: databaseType:bibtex;}
