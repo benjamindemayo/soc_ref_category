@@ -206,8 +206,9 @@
 }
 
 @Article{hembacherchildren,
-  author = {Hembacher, Emily and Frank, Michael C},
+  author = {Hembacher, Emily and deMayo, Benjamin and Frank, Michael C},
   title  = {Children’s social referencing reflects sensitivity to graded uncertainty},
+  year   = {2017},
 }
 
 @Article{sodian2012metacognition,
@@ -589,6 +590,39 @@
   volume    = {40},
   number    = {3},
   pages     = {697--722},
+  publisher = {Wiley Online Library},
+}
+
+@Article{frank2012measuring,
+  author    = {Frank, Michael C and Vul, Edward and Saxe, Rebecca},
+  title     = {Measuring the Development of Social Attention Using Free-Viewing},
+  journal   = {Infancy},
+  year      = {2012},
+  volume    = {17},
+  number    = {4},
+  pages     = {355--375},
+  publisher = {Wiley Online Library},
+}
+
+@Article{frank2009development,
+  author    = {Frank, Michael C and Vul, Edward and Johnson, Scott P},
+  title     = {Development of infants’ attention to faces during the first year},
+  journal   = {Cognition},
+  year      = {2009},
+  volume    = {110},
+  number    = {2},
+  pages     = {160--170},
+  publisher = {Elsevier},
+}
+
+@Article{baldwin1991infants,
+  author    = {Baldwin, Dare A},
+  title     = {Infants' contribution to the achievement of joint reference},
+  journal   = {Child development},
+  year      = {1991},
+  volume    = {62},
+  number    = {5},
+  pages     = {874--890},
   publisher = {Wiley Online Library},
 }
 
