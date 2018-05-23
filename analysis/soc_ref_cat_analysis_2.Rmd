@@ -158,7 +158,7 @@ preprocess.data <- function(d, x.max = 1920, y.max=1080, samp.rate = 30) {
       ) %>%
       mutate(
         t = round((d$t - d$t[1])/(1000000), 3),
-        y = y.max - y
+        y = y.max - y #y flip so origin is cartesian
       )
 }
 ```
@@ -726,4 +726,240 @@ median_trial_length <-
   filter(trial_length > 0) %>% 
   summarise(median = median(trial_length))
 ```
+
+```{r}
+#Looking at a more constrained AOI
+
+all_data_constrained <-  
+  all_data %>% 
+  mutate(
+    x_bin = (x %/% (1920 / 4)) + 1,
+    y_bin = (y %/% (1020 / 3)) + 1,
+    looking = !(is.na(x_bin) 
+                | is.na(y_bin) 
+                | x_bin == 1 
+                | x_bin == 4 
+                | y_bin == 1)
+  )
+
+trial_proportions_constrained <- 
+  all_data_constrained %>% 
+  filter(!is.na(trial)) %>% 
+  group_by(sid, trial) %>% 
+  mutate(
+    trial_length = max(t) - min(t),
+    look_captured = looking
+  ) %>% 
+  mutate(look = case_when(
+    look_captured ~ "looking",
+    !look_captured ~ "not_looking"
+  )) %>% 
+  ungroup() %>% 
+  count(sid, trial, look, Morph) %>% 
+  spread(look, n) %>% 
+  left_join(
+    demographics %>% select(SID, age),
+    by = c("sid" = "SID")
+  ) %>%
+  
+  replace_na(list(looking = 0, not_looking = 0)) %>% 
+  mutate(prop_looking_constrained = looking / (looking + not_looking))
+
+trial_lengths <-  
+  d_trials %>% 
+  mutate(length = offset - onset) %>% 
+  filter(length > 0) %>% 
+  arrange(length)
+
+trial_lengths %>% 
+  ggplot(aes(as.factor(Morph), length)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 15)) +
+  ggthemes::theme_few()
+
+
+
+
+
+morph_proportions_constrained <- 
+  trial_proportions_constrained %>% 
+  group_by(Morph) %>% 
+  multi_boot_standard(col = "prop_looking_constrained")
+
+morph_proportions_constrained %>% 
+  ggplot(aes(as.factor(Morph), mean)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = "Morph level",
+    y = "Proportion of trial looking",
+    title = "Proportion of Trial Spent Looking at Experimenter"
+  ) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12)
+  ) 
+
+morph_proportions_per_subject <-  
+  trial_proportions %>% 
+  group_by(sid, Morph) %>% 
+  summarize(mean_prop_looking = mean(prop_looking))
+
+morph_proportions_per_subject %>% 
+  ggplot(aes(as.factor(Morph), mean_prop_looking)) +
+  geom_col() +
+  labs(
+    x = "Morph",
+    y = "Mean percentage of trial looking"
+  ) +
+  scale_y_continuous(labels = scales::percent) +
+  facet_wrap(~ sid)
+
+morph_proportions_per_subject %>% 
+  ggplot(aes(`Morph`, mean_prop_looking)) +
+  geom_point() +
+  labs(
+    x = "Morph",
+    y = "Mean percentage of trial looking"
+  ) +
+  coord_cartesian(ylim = c(0, 1))
+
+accuracy_looking <- 
+  trial_proportions %>% 
+  left_join(
+    all_data %>% select(sid, trial, accuracy)
+  ) %>% 
+  group_by(sid, trial) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  group_by(accuracy) %>% 
+  multi_boot_standard(col = "prop_looking")
+
+  
+```
+
+```{r}
+#looking at time course by morph
+
+trial_viz_morph <- 
+  all_data %>% 
+  group_by(sid, trial, Morph) %>% 
+  mutate(
+    trial_time = t - min(t),
+    bin = (trial_time %/% 0.5) * 0.5
+  ) %>% 
+  ungroup() %>% 
+  arrange(bin, sid, Morph) %>% 
+  mutate(looking = !is.na(x) & !is.na(y)) %>% 
+  select(trial_time, bin, looking, Morph, everything()) 
+
+trial_viz_n_morph <- 
+  trial_viz_morph %>% 
+  group_by(bin, sid, trial, Morph) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  count(bin, Morph)
+
+trial_viz_ci_morph <- 
+  trial_viz_morph %>% 
+  group_by(bin, Morph, sid) %>% 
+  summarize(mean_looking = mean(looking)) %>% 
+  ungroup() %>% 
+  group_by(bin, Morph) %>% 
+  multi_boot_standard(col = "mean_looking") %>% 
+  ungroup() %>% 
+  mutate(axis_position = bin + 0.25) %>% 
+  left_join(
+    trial_viz_n_morph,
+    by = c("bin", "Morph")
+  ) %>% 
+  mutate(morph = as.factor(Morph))
+
+trial_viz_ci_morph %>% 
+  filter(bin <= 10) %>% 
+  ggplot(aes(axis_position, mean, color = morph)) +
+  geom_point(aes(size = n), alpha = 0.6) +
+  geom_line() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.1) +
+  labs(
+    x = "time after beginning of trial (seconds)",
+    y = "mean proportion looking at experimenter",
+    title = "Time course of proportion looking\nat experimenter across trials",
+    size = "Number of trials\nrepresented"
+  ) +
+  scale_x_continuous(breaks = seq(from = 0, to = 10, by = 0.5)) +
+  scale_size_continuous(breaks = seq(from = 250, to = 0, by = -50), range = c(0.5, 5)) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 8)
+  ) +
+  coord_cartesian(xlim = c(0, 6))
+```
+
+```{r}
+#reverse timecourse visualization broken down by morph
+
+trial_viz_backwards_morph <-
+  all_data %>% 
+  group_by(sid, trial, Morph) %>% 
+  mutate(
+    t_before_decision = t - max(t),
+    time_bin = (t_before_decision %/% 0.5) * 0.5  
+  ) %>% 
+  ungroup() %>% 
+  arrange(time_bin, sid, Morph) %>% 
+  mutate(looking = !is.na(x) & !is.na(y)) %>% 
+  select(t_before_decision, time_bin, sid, everything())
+
+trial_viz_n_backwards_morph <- 
+  trial_viz_backwards_morph %>% 
+  group_by(time_bin, sid, trial, Morph) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  count(time_bin, Morph)
+
+trial_viz_ci_backwards_morph <- 
+  trial_viz_backwards_morph %>% 
+  group_by(time_bin) %>% 
+  multi_boot_standard(col = "looking") %>% 
+  ungroup() %>% 
+  mutate(axis_position = time_bin - 0.25) %>% 
+  left_join(
+    trial_viz_n_backwards,
+    by = c("time_bin")
+  )
+
+```
+
+
+```{r}
+#making the data frame for all of the models
+View(lmer_data)
+
+test_data <- 
+  lmer_data %>% 
+  left_join(
+    trial_proportions_constrained %>% 
+      mutate(trial = as.factor(trial)) %>% 
+      select(sid, trial, prop_looking_constrained),
+    by = c("sid", "trial")
+  ) %>% 
+  left_join(
+    d_trials %>%
+      mutate(
+        trial = as.factor(trial),
+        length = offset - onset
+      ) %>%
+      filter(length > 0) %>% 
+      select(SID, trial, accuracy, length),
+    by = c("sid" = "SID", "trial")
+  )
+
+```
+
 

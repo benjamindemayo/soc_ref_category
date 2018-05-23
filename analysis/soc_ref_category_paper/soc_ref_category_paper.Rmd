@@ -20,7 +20,7 @@ author_note: |
 
 
 abstract: |
-  Children between 3 and 5 years old show an emerging ability to monitor their own epistemic uncertainty. However, little is known about children's sensitivity to graded uncertainty and how they adjust their information-seeking behaviors in situations other than those of complete knowledge and complete ignorance. Here, I investigated children's spontaneous social information-gathering behaviors under various levels of graded category uncertainty. Children ages 3-5 (n = 30) were asked to categorize images of creatures which varied in their distance from two prototype images, such that uncertainty about category membership was greater when distance from a prototype was greater. A live eye-tracking paradigm was used to measure children's levels of looking to the experimenter on a trial-by-trial basis. Children looked at the experimenter at the same rate regardless of an item's category ambiguity, suggesting that they did not adjust their information-seeking based on graded category uncertainty.
+  Children between 3 and 5 years old show an emerging ability to monitor their own epistemic uncertainty. However, little is known about children's sensitivity to graded uncertainty and how they adjust their information-seeking behaviors in situations other than those of complete knowledge and complete ignorance. Here, I investigated children's spontaneous social information-gathering behaviors under various levels of graded category uncertainty. Children ages 3-5 (n = 29) were asked to categorize images of creatures which varied in their distance from two prototype images, such that uncertainty about category membership was greater when distance from a prototype was greater. A live eye-tracking paradigm was used to measure children's levels of looking to the experimenter on a trial-by-trial basis. Children looked at the experimenter at the same rate regardless of an item's category ambiguity, suggesting that they did not adjust their information-seeking based on graded category uncertainty.
 
   
 keywords          : "information gathering; uncertainty monitoring; category discrimination"
@@ -47,7 +47,8 @@ library(tidyverse)
 library(stringr)
 library(magrittr)
 library(lmerTest)
-
+library(broman)
+library(xtable)
 
 example_file <- "../raw_data/020218_01-eye_data Samples.txt"
 
@@ -76,29 +77,29 @@ Below, I review prior research that demonstrates children's capacities to engage
 
 ```{r schematic, fig.align="center", fig.cap="Schematic representation of theoretical background and prior research informing the current study."}
 
-knitr::include_graphics("../images/diagram_lit_review.jpg")
+knitr::include_graphics("../images/diagram_lit_review_1.jpg")
 
 ```
 
 ##Uncertainty Monitoring and Active Learning in Early Childhood
 
-Prior work on children's uncertainty monitoring has yielded mixed evidence as to whether young children can successfully recognize when they lack information and subsequently act on this knowledge of their own ignorance to make a decision [@sodian2012metacognition].  Early studies investigating metacognitive development indicated that children's competence in assessing and acting on their own epistemic ignorance is limited. Markman [-@markman1977realizing] explained a card game to first and third grade children with ambiguous language such that understanding the object of the game was impossible without seeking clarification. An experimenter then prompted the child to seek this clarification with scripted statements such as "What do you think?", "Do you have any questions?" and "Did I tell you everything you need to know to play the game?" In this study, Markman found that the younger children required more prompts before seeking out additional information, which she argues is an indication that young elementary school children do not engage in "constructive processing". That is, they process the instructions being given by the experimenter superficially without simulating trying to execute them, and are consequently unaware of gaps in their own knowledge. 
+Prior work on children's uncertainty monitoring has yielded mixed evidence as to whether young children can successfully recognize when they lack information and subsequently act on this knowledge of their own ignorance to make a decision [@sodian2012metacognition].  Early studies investigating metacognitive development indicated that children's competence in assessing and acting on their own epistemic ignorance is limited. Markman [-@markman1977realizing] explained a card game to first and third grade children with ambiguous language such that understanding the object of the game was impossible without seeking clarification. An experimenter then prompted the child to seek this clarification with scripted statements such as "What do you think?", "Do you have any questions?" and "Did I tell you everything you need to know to play the game?" In this study, Markman found that the younger children required more prompts before seeking out additional information, which she argues is an indication that young elementary school children do not engage in "constructive processing". That is, they process the instructions being given by the experimenter superficially without simulating the process of trying to execute them, and are consequently unaware of gaps in their own knowledge. 
 
 Similarly, Flavell, Speer, Green, August, & Whitehurst [-@flavell1981development] asked kindergarten and second-grade children to reconstruct block structures built by a confederate based on a tape of instructions from the confederate, which were not sufficiently clear to successfully recreate the structure.  The researchers found that older children were more likely to indicate the need for additional clarifying information by replaying the tape, asking questions explicitly, or generally looking puzzled. Conversely, kindergarteners typically did not display these behaviors. This result demonstrated that older children were more adept at seeking information explicitly, but it also showed that younger children were less likely to spontaneously seek information from the environment (for example, by replaying the tape). 
 
-Rather than measure children's spontaneous information-seeking behaviors, some more recent research has gauged children's uncertainty monitoring capacities by asking them to report on their decision confidence in various contexts. When asked to report confidence in their answers on a memory task, 3-year-olds were equally confident about correct and incorrect responses, while 4- and 5-year-olds showed a more adult-like pattern of lower confidence for incorrect responses [@hembacher2014don]. In a perceptual identification task, 3- to 5-year-olds reported being less confident when they provided incorrect responses, although overall they were still overconfident [@coughlin2015introspection]. In order to avoid requiring a verbal response from children, which may obscure children's capacity to reflect on their own ignorance, these studies used a pictorial confidence scale when prompting children to report on their uncertainty. However, the possibility exists that even these studies underestimate children's ability to monitor their own uncertainty because they require children to explicitly report their confidence (even if not in an open-ended verbal response), and that children can act on their own uncertainty before they can communicate it through explicit responses or reflect on it consciously. Thus, although these studies did not hinge on an verbal report of uncertainty from children (which may be the most difficult response for a child to provide), they still required children to explicitly report on their confidence - a measure of uncertainty which may be still more difficult than more implicit, spontaneous and action-based measures.
+Rather than measure children's spontaneous information-seeking behaviors, some more recent research has gauged children's uncertainty monitoring capacities by asking them to report on their decision confidence in various contexts. When asked to report confidence in their answers on a memory task, 3-year-olds were equally confident about correct and incorrect responses, while 4- and 5-year-olds showed a more adult-like pattern of lower confidence for incorrect responses [@hembacher2014don]. In a perceptual identification task, 3- to 5-year-olds reported being less confident when they provided incorrect responses, although overall they were still overconfident [@coughlin2015introspection]. In order to avoid requiring a verbal response from children, which may obscure children's capacities to reflect on their own ignorance, these studies used a pictorial confidence scale when prompting children to report on their uncertainty. However, the possibility exists that even these studies underestimate children's ability to monitor their own uncertainty because they require children to explicitly report their confidence (even if not in an open-ended verbal response), and that children can act on their own uncertainty before they can communicate it through explicit responses or reflect on it consciously. Thus, although these studies did not hinge on an verbal report of uncertainty from children (which may be the most difficult response for a child to provide), they nonetheless required children to explicitly report on their confidence - a measure of uncertainty which may be still more difficult than more implicit, spontaneous and action-based measures.
 
-## Children's Spontaneous Information-seeking Behaviors
+## Children's Spontaneous Information-Seeking Behaviors
 
-In contrast to the explicit confidence measurements used in the studies discussed above, some research has shown that children engage in spontaneous information-gathering behaviors -- that is, behaviors that are not prompted explicitly by an experimenter -- more often when they are faced with uncertainty. These studies demonstrate that children engage in *active learning*, in which the learner decides what information they want to be exposed to, rather than having the decision made for them by a teacher [@gureckis2012self]. While early research on children's metacognitive development also measured unprompted information-seeking behaviors and found that younger children do not engage in spontaneous information-seeking, these early studies often required an explicit verbal response from children, as in Markman [-@markman1977realizing]. Furthermore, studies such as Flavell, et al. [-@flavell1981development] showed children's deficit in realizing when instructions are insufficient, which may be more difficult for children than realizing they lack other types of knowledge, such as memory of an event. Specifically, it may be particulary difficult for children to realize they lack understanding or knowledge of instructions, since doing so requires that children realize that they may encounter an obstacle in the future that may not be immediately apparent to them at the moment the instructions are given. 
+In contrast to the explicit confidence measurements used in the studies discussed above, some research has shown that children engage in spontaneous information-gathering behaviors -- that is, behaviors that are not prompted explicitly by an experimenter -- more often when they are faced with uncertainty. These studies demonstrate that children engage in *active learning*, in which the learner decides what information they want to be exposed to, rather than having the decision made for them by a teacher [@gureckis2012self]. While early research on children's metacognitive development also measured unprompted information-seeking behaviors and found that younger children do not engage in spontaneous information-seeking, these early studies often required an explicit verbal response from children, as in Markman [-@markman1977realizing]. Furthermore, studies such as Flavell, et al. [-@flavell1981development] showed children's deficit in realizing when instructions are insufficient, which may be more difficult for children than realizing they lack other types of knowledge, such as memory of an event. Specifically, it may be particulary difficult for children to realize they lack understanding or knowledge of instructions, since doing so requires that children recognize that they may encounter an obstacle in the future which may not be immediately apparent to them at the moment the instructions are given. 
 
-Recent research which at least partially alleviated these task demands has found evidence of children's engagement in spontaneous information-seeking. In one study, when 2-year-old children were asked to find a sticker hidden inside of one of several tubes, they peeked inside the tubes more when they had not seen the experimenter place the sticker, indicating that they spontaneously sought out more information when deprived of sufficient information to make a decision [@call2001apes]. In another study, young children were shown a group of toys that either differed in their color or in how they felt to the touch [@robinson2008children]. All of the toys were put into a bag by the experimenter, who mixed them up and then picked out a toy. In the condition where the experimenter put the toy on the table and ask the child, "Which one is it?", children more often reached out and touched the toy more when its distinctive quality was texture than when it was color. In contrast, when the experimenter handed the object to the child, thus giving the child visual and tactile access to the toy simultaneously, children still correctly were able to identify whether the toy was soft or hard, but unable to accurately report that they had arrived at this conclusion by touching the toy. Thus, in this particular context, children interact with the environment using sensory modalities that will most effectively fill in gaps in uncertainty, even if they are unable to explicitly report doing so.  
+Recent research which at least partially alleviated these task demands has found evidence of children's engagement in spontaneous information-seeking. In one study, when 2-year-old children were asked to find a sticker hidden inside of one of several tubes, they peeked inside the tubes more when they had not seen the experimenter place the sticker, indicating that they spontaneously sought out more information when deprived of sufficient information to make a decision [@call2001apes]. In another study, young children were shown a group of toys that either differed in their color or in how they felt to the touch [@robinson2008children]. All of the toys were put into a bag by the experimenter, who mixed them up and then picked out a toy. In the condition where the experimenter put the toy on the table and asked the child, "Which one is it?", children more often reached out and touched the toy more when its distinctive quality was texture than when it was color. In contrast, when the experimenter handed the object to the child, thus giving the child visual and tactile access to the toy simultaneously, children still correctly were able to identify whether the toy was soft or hard, but unable to accurately report that they had arrived at this conclusion by touching the toy. Thus, in this particular context, children interacted with the environment using sensory modalities that most effectively filled in gaps in uncertainty, even if they were unable to explicitly report doing so.  
 
-Schulz and Bonawitz [-@schulz2007serious] also found that when young children were presented with a causally-confounded toy (i.e., a toy that exhibited a behavior whose causal structure could not be deduced) and could choose between playing with that toy or a novel toy, they chose to further explore the causally-confounded toy. However, when the choice was between continuing to play with a causally-unconfounded toy and playing with a new toy, children preferred the novelty of exploring the new toy, demonstrating that children play spontaneously in order to maximize learning based on uncertainty about the world. Goupil & Kouider [-@goupil2016infants] found that even preverbal infants faced with an object-retrieval task persisted on their answers more when they were correct than incorrect, showing that children are sensitive to their own likely accuracy and flexibly adjust their actions accordingly. 
+Schulz and Bonawitz [-@schulz2007serious] also found that when young children were presented with a causally-confounded toy (i.e., a toy that exhibited a behavior whose causal structure could not be deduced) and could choose between playing with that toy or a novel toy, they chose to further explore the causally-confounded toy. However, when the choice was between continuing to play with a causally-unconfounded toy and playing with a new toy, children preferred the novelty of exploring the new toy, demonstrating that children play spontaneously in order to maximize learning based on uncertainty about the world. 
 
 ##Children's Social Referencing and Social-Information Gathering
 
-Taken together, these studies provide compelling evidence that children choose to seek more information specifically to resolve uncertainty, and that they sample sources of evidence that are most likely to provide disambiguating information. In this study, I examine the selectivity of children's spontaneous sampling social information. In order to do this, children must consider other people to be helpful sources of information. 
+Taken together, these studies provide compelling evidence that children choose to seek information specifically to resolve uncertainty, and that they sample sources of evidence that are most likely to provide disambiguating information. In this study, I examine the selectivity of children's spontaneous sampling of social information. In order to do this, children must consider other people to be helpful sources of information. 
 
 Evidence in a number of experimental contexts suggests that infants and young children reference trusted adults for disambiguating information in situations of uncertain outcomes and potential danger.  Sorce, Emde, Campos, and Klinnert [-@sorce1985maternal] showed that infants look to their mothers to determine whether it is safe to proceed crawling over a "visual-cliff", a glass table that is actually safe to walk on but which looks like a daunting drop-off to an infant. When infants' caregivers showed an encouraging expression, infants tended to crawl onto the glass surface, whereas they avoided doing so when their mother showed a frightened facial expression. Other studies have shown that children use caregivers' emotional appraisals of novel toys [@klinnert1981infants; @feinman1982social; @hornik1987effects] and recently-met strangers[@feinman1983social] to inform how they interact with newly-encountered aspects of their environments. 
 
@@ -112,13 +113,13 @@ A large body of evidence suggests that young children are selective social learn
 
 ##Selective social learning on the basis of uncertainty
 
-Despite young children's apparent lack of ability to explicitly report their own uncertainty, a few studies indicate that young children may seek and use information selectively from other people on the basis of epistemic uncertainty. Tamis-LeMonda et al. [-@tamis2008infants] extended the finding of Sorce et al. [-@sorce1985maternal] in order to determine whether children consider the expressions of their caregivers more when the safety of the environment is more uncertain versus when it is completely certain. In this study, researchers tested whether 18-month-old infants would walk down slopes of varying risk levels when given either encouraging or discouraging signals from their mothers.  The researchers found that children tended to ignore their mothers' encouraging messages when faced with a slope that was clearly too steep to walk down safely, and similarly ignored mothers' discouraging messages when the slope was obviously safe. At borderline slopes, when it was unclear to infants whether the slope was safe to walk down or not, children tended to comply much more consistently with the encouragement or discouragement provided by mother, showing that even  infants selectively give more weight to social information when perceptual input is not enough to make a decision. 
+Despite young children's apparent lack of ability to explicitly report their own uncertainty, a few studies indicate that young children may seek and use information selectively from other people on the basis of epistemic uncertainty. Tamis-LeMonda et al. [-@tamis2008infants] extended the finding of Sorce et al. [-@sorce1985maternal] in order to determine whether children consider the expressions of their caregivers more when the safety of the environment is more uncertain versus when it is completely certain. In this study, researchers tested whether 18-month-old infants would walk down slopes of varying risk levels when given either encouraging or discouraging signals from their mothers.  The researchers found that children tended to ignore their mothers' encouraging messages when faced with a slope that was clearly too steep to walk down safely, and similarly ignored mothers' discouraging messages when the slope was obviously safe. At borderline slopes, when it was unclear to infants whether the slope was safe to walk down or not, children tended to comply much more consistently with the encouragement or discouragement provided by their mother, showing that even  infants selectively give more weight to social information when perceptual input is not enough to make a decision. 
 
-While the study by Tamis-LeMonda et al. examined children's selective integration of social information, it did not include children's sampling (e.g., through gaze shifts) of social information as a dependent measure. Some recent research has begun to address the question of whether children actively seek out information from their social partners when uncertainty is high. Vredenburgh and Kushnir [-@vredenburgh2016young] investigated children's propensity to ask questions when faced with toy-assembly tasks of differential levels of difficulty. They found that preschoolers were significantly more likely to ask an experimenter for help on tasks that were more difficult for them, indicating that children adjust their social information-gathering behavior to optimize their learning. Another study examined whether infants selectively reference their social partners' gaze when their social partners has uttered an ambiguous object label [@vaish2011thirteen]. In this study, infants heard an experimenter produce a novel label when there were either two or one single objects present. Infants looked up more at the experimenter when there were two objects present and the referent of the experimenter's label was thus ambiguous. 
+While the study by Tamis-LeMonda et al. examined children's selective integration of social information, it did not include children's sampling (e.g., through gaze shifts) of social information as a dependent measure. Some recent research has begun to address the question of whether children actively seek out information from their social partners when uncertainty is high. Vredenburgh and Kushnir [-@vredenburgh2016young] investigated children's propensity to ask questions when faced with toy-assembly tasks of differential levels of difficulty. They found that preschoolers were significantly more likely to ask an experimenter for help on tasks that were more difficult for them, indicating that children adjust their social information-gathering behavior to optimize their learning. Another study examined whether infants selectively reference their social partners' gaze when their social partner has uttered an ambiguous object label [@vaish2011thirteen]. In this study, infants heard an experimenter produce a novel label when there were either two or one novel objects present. Infants looked up more at the experimenter when there were two objects present and the referent of the experimenter's label was thus ambiguous. 
 
-A later study by Hembacher, deMayo, and Frank (2017) sought to replicate and extend the finding of Vaish et al. with preschool-aged children. In this study, children aged 2 - 5 were presented with either one or two objects, heard a label produced by the experimenter, and asked to put the labeled item in a bucket. The number of objects (1 vs. 2) and their familiarity to the child were varied to manipulate referential ambiguity. Across two experiments, they found that children looked up at the experimenter more as they were making their choice when referential ambiguity was present. Specifically, children did the most looking at the experimenter when both objects were novel, did the least looking when both objects were familiar, and did an intermediate amount when one of the objects was familiar and one was novel. Additionally, when helpful gaze from the experimenter was included as a between-subjects manipulation, children looked up at the experimenter more when one object was familiar and one was novel, but only when helpful gaze was absent, suggesting that children's social referencing might be sensitive to graded levels of epistemic uncertainty. Thus, children are not only sensitive to states of complete ignorance and complete knowledge, but may also be sensitive to intermediate levels of evidence for a hypothesis. 
+A later study by Hembacher, deMayo, and Frank (2017) sought to replicate and extend the finding of Vaish et al. with preschool-aged children. In this study, children aged 2 - 5 years were presented with either one or two objects, heard a label produced by the experimenter, and asked to put the labeled item in a bucket. The number of objects (1 vs. 2) and their familiarity to the child were varied to manipulate referential ambiguity. Across two experiments, they found that children looked up at the experimenter more as they were making their choice when referential ambiguity was present. Specifically, children did the most looking at the experimenter when both objects were novel, did the least looking when both objects were familiar, and did an intermediate amount when one of the objects was familiar and one was novel. Additionally, when helpful gaze from the experimenter was included as a between-subjects manipulation, children looked up at the experimenter more when one object was familiar and one was novel, but only when helpful gaze was absent, suggesting that children's social referencing might be sensitive to graded levels of epistemic uncertainty. Thus, children are not only sensitive to states of complete ignorance and complete knowledge, but may also be sensitive to intermediate levels of evidence for a hypothesis. 
 
-##Sensitivity to graded uncertainty
+##Sensitivity to Graded Uncertainty
 
 Although these results provide initial evidence that children seek social information on the basis of graded uncertainty, this study did not manipulate ambiguity in a continuous fashion, but rather presented children with only one intermediate level of uncertainty between complete certainty and complete ambiguity. In many learning contexts (i.e., category learning) many more degrees of ambiguity exist than complete certainty and complete ambiguity. 
 
@@ -130,15 +131,13 @@ In sum, while 3 to 6-year-old children struggle to demonstrate explicit or verba
 
 ##Current Study
 
-Building off the findings discussed above, the current study was uses a categorization paradigm to determine whether children's social information-gathering is driven by graded uncertainty. Children completed a category discrimination game in which they were introduced to two creatures, and told that each creature had a specific box that it was supposed to live in. They were then handed a number of images depicting creatures at various points on the perceptual continuum between the two prototype images to which they had initially been exposed, and were asked to put each creature in its correct box. The critical dependent measure was the duration of children's looks to the experimenter seated across the table from them, which I measured with an SMI RED-n eye-tracker. I predicted that children would look longer to the experimenter when attempting to categorize stimuli closer to the center of the perceptual continuum. This design allowed me to examine the degree to which children's social referencing is sensitive to graded uncertainty.
+Building off the findings discussed above, the current study used a categorization paradigm to determine whether children's social information-gathering is driven by graded uncertainty. Children completed a category discrimination game in which they were introduced to two creatures, and told that each creature had a specific box that it was supposed to live in. They were then handed a number of images depicting creatures at various points on the perceptual continuum between the two prototype images to which they had initially been exposed, and were asked to put each creature in its correct box. The critical dependent measure was the duration of children's looks to the experimenter seated across the table from them, which I measured with an SMI RED-n eye-tracker. I predicted that children would look longer to the experimenter when attempting to categorize stimuli closer to the center of the perceptual continuum. 
 
 A categorization task was used here in part because category learning is a critical learning context in early childhood. Young children possess many mechanisms that facilitate category learning, including sensitivity to statistical regularities in the environment [@saffran1996statistical], sensitivity towards correlations of shared attributes among objects [@younger1985segregation], and acute attention to perceptual features such as shape [@imai1994children]. Selectively seeking social information on the basis of graded uncertainty could be another such mechanism that aids in children's category learning.  It is an open question whether children seek out disambiguating evidence when there is less evidence for an object's category membership.
 
-In this study, I introduced children to two different types of "imaginary creatures" based on stimuli created by Havy and Waxman [-@havy2016naming]. These stimuli sets consisted of two different perceptual continua, such that an image's category identity was more ambiguous as the center of the perceptual continuum is approached. I then asked children to categorize each image. I was interested in whether children's looks to the experimenter would reflect graded levels of category uncertainty, such that children would spend more time looking at the experimenter when the target creature was closer to the center of continuum. I predicted that children's looking would show this pattern.  
+Eye-tracking technology was used in this study to allow me to measure the duration of children's looks to the experimenter with greater precision than that afforded by hand-coding. Typically, research in social cognition that uses eye-tracking (particularly when it involves children) measures children's gaze patterns on a digital stimulus display such as a television screen which shows still or moving images  [@gredeback2009eye]. This is partially due to the fact that live-eye tracking with both children and adults is more difficult than using conventional eye-tracking displays. Nevertheless, some research suggests that social looking behaviors may differ slightly when a participant is engaged in a real social interaction as opposed to viewing a screen image of the same interaction [@risko2012social].  One study in particular suggests that an interaction with a live conversant draws more social gaze than a video display of a similar interaction, simply because a live conversation creates the potential for social interaction in ways taht videos cannot [@laidlaw2011potential]. A separate line of research also shows that children learn more effectively when interacting with a social partner whose actions are contingent on the child's actions, as compared to watching a video of a person acting as a teacher [@troseth2006young; @roseberry2014skype]. As a result, it may be that children shift gaze to a socially contingent partner in a different way than they would to a prerecorded social partner who does not actually interact with the child.
 
-Eye-tracking technology was used in this study to allow me to measure the duration of children's looks to the experimenter with greater precision than that afforded by hand-coding. Typically, research in social cognition that uses eye-tracking (particularly when it involves children) measures children's gaze patterns on a digital stimulus display such as a television screen which shows still or moving images  [@gredeback2009eye]. This is partially due to the fact that live-eye tracking with both children and adults is more difficult than conventional eye-tracking displays which use a digital stimulus display. Nevertheless, some research suggests that social looking behaviors may differ slightly when a participant is engaged in a real social interaction as opposed to viewing a screen image of the same interaction [@risko2012social].  One study in particular suggests that merely the potential for social interaction that exists with a live partner draws social gaze more than video images of the same social partner [@laidlaw2011potential]. A separate line of research also shows that children learn more effectively when interacting with a social partner whose actions are contingent on the child's actions, as compared to watching a video of a person acting as a teacher [@troseth2006young; @roseberry2014skype]. As a result, it may be that children shift gaze to a socially contingent partner in a different way than they would to a prerecorded social partner who does not actually interact with the child.
-
-Despite the methodological challenges associated with live eye tracking, its use with children and infants is not unprecedented. This technique has mostly been used to examine social gaze irregularities in children with Autism Spectrum Disorder (ASD), and has been used with children of preschool and primary school age [@noris2012investigating; @falck2015eye; @nadig2010does]. At least one study has also extended this type of eye-tracking to typically-developing infants. Gredeback, Fikke, and Melinder examined the development of infants' gaze-following behaviors between 2 and 8 months and using a live eye-tracking paradigm (-@gredeback2010development). In this study, infants began showing gaze-following behaviors between 2 to 4 months of age, and were more likely to follow the gaze of a stranger than the gaze of their mother. 
+Despite the methodological challenges associated with live eye tracking, its use with children and infants is not unprecedented. This technique has mostly been used to examine social gaze irregularities in children with Autism Spectrum Disorder (ASD), and has been used with children of preschool and primary school age [@noris2012investigating; @falck2015eye; @nadig2010does]. At least one study has also extended this type of eye-tracking to typically-developing infants. Gredeback, Fikke, and Melinder examined the development of infants' gaze-following behaviors between 2 and 8 months using a live eye-tracking paradigm [-@gredeback2010development]. In this study, infants began showing gaze-following behaviors between 2 to 4 months of age, and were more likely to follow the gaze of a stranger than the gaze of their mother. 
 
 In sum, since prior research indicated that such a live eye-tracking approach was possible, and since using an eye tracker decreases the potential for human error involved in hand-coding, I used an eye-tracking setup to measure gaze shifts to an in-person social partner. 
 
@@ -146,7 +145,7 @@ In sum, since prior research indicated that such a live eye-tracking approach wa
 # Methods
 
 ## Pilot Testing
-I developed the experimental procedure descibed below over a 5-week pilot testing period. During this period, I recruited 40 child participants at the Children's Discovery Museum in San Jose, CA who participated in various preliminary versions of the task. The primary purpose of pilot testing was to arrive at a version of the test that (a) showed levels of accuracy on the task that indicated differential levels of uncertainty for children during the task, and (b) kept children engaged and was enjoyable to them. Several facets of the experimental design were adjusted throughout the pilot-testing process, including the color of the stimuli, the number of trials, the presenation of motivational rewards (stickers) throughout the task, and whether children had visual access to prototype images of stimuli they were being asked to categorized.
+I developed the experimental procedure descibed below over a 5-week pilot testing period. During this period, I recruited 40 child participants at the Children's Discovery Museum in San Jose, CA who participated in various preliminary versions of the task. The primary purpose of pilot testing was to arrive at a version of the test that (a) showed levels of accuracy on the task that indicated differential levels of uncertainty for children, and (b) kept children engaged and (c) was enjoyable to them. Several facets of the experimental design were adjusted throughout the pilot-testing process, including the color of the stimuli, the number of trials, the presenation of motivational rewards (stickers) throughout the task, and whether children had visual access to prototype images of stimuli they were being asked to categorized during test trials.
 
 ```{r include=FALSE}
 # Read in trial data.
@@ -212,6 +211,14 @@ d_trials <-
   left_join(
     demographics %>% select(SID, age),
     by = "SID"
+  ) %>% 
+  mutate(
+    block = case_when(
+      1 <= trial & trial <= 7 ~ 1,
+      8 <= trial & trial <= 14 ~ 2,
+      15 <= trial & trial <= 21 ~ 3,
+      22 <= trial & trial <= 28 ~ 4
+    )
   )
 
 mean_age <- 
@@ -222,13 +229,13 @@ mean_age <-
 ```
 
 ## Participants
-I recruited a sample of 30 children aged 3 to 5 years (mean age = `r mean_age`) at the Bing Nursery School at Stanford University in Stanford, CA. Children were asked by the experimenter if they wanted to play a short game during their regularly scheduled free-play. Children were predominantly white and Asian and generally had highly-educated parents. All children were tested by the same experimenter and were randomly assigned to one of four counterbalance conditions.
+I recruited a sample of 37 children aged 3 to 5 years (mean age = `r mean_age`) at the Bing Nursery School at Stanford University in Stanford, CA. Seven children were dropped from the analyses because of issues with their data (e.g., incomplete video data or insufficient eye-tracker calibration). One child's data was formatted incorrectly, though I was not able to identify the source of the issue, so I had to drop the participant, leaving me with a final sample size of 29 participants (1 fewer than I specified in my preregistration, which can be found at `https://aspredicted.org/see_one.php?a_id=8960`). I asked all participants if they wanted to play a short game during their regularly scheduled free-play. Children were predominantly white and Asian and generally had highly-educated parents. All children were tested by the same experimenter (myself) and were randomly assigned to one of four counterbalance conditions.
 
 ## Stimuli, Design and Procedure
 
-```{r stimuli, fig.align="center", fig.cap="Stimulus sets provided to children. Images on the ends of the spectrums are prototypes which morph into each other an a perceptual continuum."}
+```{r stimuli, fig.align="center", fig.cap="Stimulus sets provided to children. Images on the ends of the spectrums are prototypes which morph into each other on a perceptual continuum."}
 
-knitr::include_graphics("../images/stimuli.png")
+knitr::include_graphics("../images/stimuli_1.png")
 
 ```
 
@@ -245,7 +252,7 @@ knitr::include_graphics("../images/setup.jpg")
 
 Children were seated in a small chair in front of a table which contained two boxes, one red and one green, both placed within their reach (Figure \ref{fig:setup}). The boxes had openings in the lids to allow children to deposit the stimulus cards into them. When children entered the room, they sat across a 60-centimeter-wide table from a large poster-board which displayed the images for the eye-tracking calibration procedure. After the calibration phase had ended and the experimental trials began, the poster-board was replaced with the experimenter sitting in a chair across the table from the child. 
 
-I used an SMI REDn corneal reflection eye-tracker to measure children's gaze shifts to the experimenter throughout the task. The eye-tracking device was placed on two magnetic mounts in the middle of the table, approximately 58 centimeters in front of the child . The child's field of vision was captured by an external-viewing webcam situated directly behind and slightly above the child's head. 
+I used an SMI REDn corneal reflection eye-tracker to measure children's gaze shifts to the experimenter throughout the task. The eye-tracking device was placed on two magnetic mounts in the middle of the table, approximately 58 centimeters in front of the child. The child's field of vision was captured by an external-viewing webcam situated directly behind and slightly above the child's head. 
 
 ```{r calibration, fig.cap="Calibration display. During the calibration phase, children were directed to look at each image as the experimenter approved each calibration point one by one."}
 knitr::include_graphics("../images/calibration.jpg")
@@ -253,15 +260,15 @@ knitr::include_graphics("../images/calibration.jpg")
 ```
 
 ### c) Calibration.
-Children were directed to look at each of the 5 calibration images on the poster-board situated across the table from them while the experimenter approved each point one-by-one (Figure \ref{fig:calibration}). The calibration display consisted of a large white poster board with five cartoon images: a smiling star, a puppy, a blue fish, a flower, and a red apple. After the experimenter had approved each calibration point, the child was asked to follow the experimenter's finger as it moved across the calibration display while the experimenter checked to see whether the eye-tracker was accurately representing the gaze location of the child. If the experimenter deemed this informal test of calibration accuracy to be sufficient, the experiment continued; if not, calibration was repeated.
+Children were directed to look at each of the 5 calibration images on the poster-board situated across the table from them while I approved each point one-by-one (Figure \ref{fig:calibration}). The calibration display consisted of a large white poster board with five cartoon images: a smiling star, a puppy, a blue fish, a flower, and a red apple. After I had approved each calibration point, the child was asked to follow my finger as it moved across the calibration display while I checked to see whether the eye-tracker was accurately representing the gaze location of the child. If I deemed this informal test of calibration accuracy to be sufficient, the experiment continued; if not, calibration was repeated.
 
 ### d) Procedure.
 Upon entering, I introduced children to a "sticker chart" that would be used throughout the task to keep them motivated and prevent them from getting fatigued during the experiment, which lasted about 12 minutes. Each child was asked if they preferred to write their name or whether they wanted my help in doing so; this introductory sequence was used as an opportunity to build rapport with each individual child. After the name was written on the chart, the calibration phase began.
 
-Once the calibration phase was finished, the experimenter removed the poster board and sat across from the child. The experimenter then explained to the child that he had brought pictures of imaginary creatures with him, and that he needed the child's help putting them back in their boxes. The child then categorized six practice items: two items of a 90% morph, two items of a 55% morph, and two items of a 95% morph. After the practice trials, the child completed 2 blocks of 7 test trials, each of which consisted of a 50% morph (completely ambiguous) and two each of 60%, 70%, and 100% morphs (identical to the prototypes). The morphs were presented in one of four pseudo-random orders that were counterbalanced across participants. After the first two test blocks, the child was introduced to a new pair of prototype creatures and asked to complete the same task with these new creatures. They then completed two new test blocks with the new set of creatures, consisting of the same ambiguity levels as the first two test blocks. In total, there were 6 practice and 28 test trials per child. In between each test or practice block, children got to choose a sticker for the chart they had made at the beginning of the experiment and were then reminded of the two prototype creatures at each end of the perceptual continuum. Pilot testing indicated that this  procedure invoked differential levels of accuracy based on stimulus ambiguity and avoided performance degradation by continually re-introducing the prototypes and offering a motivational reward after each block of 7 trials. 
+Once the calibration phase was finished, I removed the poster board and sat across from the child. I then explained to the child that I had brought pictures of imaginary creatures with me, and that I needed the child's help putting them back in their boxes. The child then categorized six practice items: two items of a 90% morph, two items of a 55% morph, and two items of a 95% morph. After the practice trials, the child completed 2 blocks of 7 test trials, each of which consisted of a 50% morph (completely ambiguous) and two each of 60%, 70%, and 100% morphs (identical to the prototypes). The morphs were presented in one of four pseudo-random orders that were counterbalanced across participants. After the first two test blocks, the child was introduced to a new pair of prototype creatures and asked to complete the same task with these new creatures. They then completed two new test blocks with the new set of creatures, consisting of the same ambiguity levels as the first two test blocks. In total, there were 6 practice and 28 test trials per child. In between each test or practice block, children got to choose a sticker for the chart they had made at the beginning of the experiment and were then reminded of the two prototype creatures at each end of the perceptual continuum. Pilot testing indicated that this  procedure invoked differential levels of accuracy based on stimulus ambiguity and avoided performance degradation by continually re-introducing the prototypes and offering a motivational reward after each block of 7 trials. 
 
 ### Analysis
-Each session was videotaped on a camera behind the experimenter's seat, allowing for view of the entire experimental setup. Accuracy and trial onsets and offsets were hand-coded using DataVyu software (`http://datavyu.org`). A trial was defined as the span of time between when the stimulus item became available to the child (i.e., the experimenter let go of it) and when the item was deposited in a box. Accuracy was determined by whether a child placed the stimulus item in the box corresponding to the prototype it was closer to on the spectrum; therefore, stimuli that were an exact 50% morph of both prototypes were not coded for accuracy. All stimuli, data, and analyses are available at `https://github.com/benjamindemayo/soc_ref_category`.
+Each session was videotaped on a camera behind the experimenter's seat, allowing for view of the entire experimental setup. I hand-coded accuracy and trial onsets/offsets using DataVyu software (`http://datavyu.org`). I defined a trial as the span of time between when the stimulus item became available to the child (i.e., the experimenter let go of it) and when the item was deposited in a box. Accuracy was determined by whether a child placed the stimulus item in the box corresponding to the prototype it was closer to on the spectrum; therefore, stimuli that were an exact 50% morph of both prototypes were not coded for accuracy. All stimuli, data, and analyses are available at `https://github.com/benjamindemayo/soc_ref_category`.
 
 
 ```{r include=FALSE}
@@ -269,17 +276,21 @@ Each session was videotaped on a camera behind the experimenter's seat, allowing
 
 read.smi.idf <- function(file.name) {
   d <- 
-    read_tsv(
+    read.table(
     file.name, 
-    comment = "##"
+    sep = "\t", 
+    header = TRUE, 
+    fill = TRUE,
+    comment.char = "#"
+
     ) %>% 
     filter(Type == "SMP") %>% 
     select(
       t = Time,
-      lx = "L POR X [px]",
-      rx = "R POR X [px]",
-      ly = "L POR Y [px]",
-      ry = "R POR Y [px]"
+      lx = "L.POR.X..px.",
+      rx = "R.POR.X..px.",
+      ly = "L.POR.Y..px.",
+      ry = "R.POR.Y..px."
     ) %>% 
     mutate(sid = str_extract(file.name, "\\d{6}_\\d{2}"))
 }
@@ -362,6 +373,7 @@ for (file.name in files) {
   d <- read.smi.idf(str_c(raw.data.path, file.name, sep = ""))
   d <- preprocess.data(d, x.max = 1920, y.max = 1080, samp.rate = 30) 
   
+
   calibration_time <- d$t[nrow(d)] - exp_trials$webcam_length[1]
 
   d %<>% 
@@ -389,278 +401,9 @@ write_csv(all_data, path = paste0(processed.data.path, "socref_cat_data.csv"))
 
 ## Procedural and Manipulation checks
 
-```{r include=FALSE}
-#Accuracy checks.
+```{r}
+#Generate data frame for regression models
 
-d_trials_block <- 
-  d_trials %>% 
-  mutate(
-    block = case_when(
-      1 <= trial & trial <= 7 ~ 1,
-      8 <= trial & trial <= 14 ~ 2,
-      15 <= trial & trial <= 21 ~ 3,
-      22 <= trial & trial <= 28 ~ 4
-    )
-  )
-
-trial_wise_accuracy <- 
-  d_trials %>% 
-  select(SID, trial, Morph, accuracy, age) %>% 
-  filter(!is.na(accuracy)) %>% 
-  rename(morph = Morph) %>% 
-  mutate(
-    morph = factor(morph),
-    trial = factor(trial),
-    age_c = as.numeric(langcog::scale(age, scale = FALSE))
-  )
-
-trial_wise_accuracy_block <- 
-  d_trials_block %>% 
-  select(SID, trial, block, accuracy, age) %>% 
-  filter(!is.na(accuracy)) %>% 
-  mutate(
-    block = factor(block),
-    trial = factor(trial),
-    age_c = as.numeric(langcog::scale(age, scale = FALSE))
-  )
-  
-d_accuracy_morph <- 
-  d_trials_block %>%
-  filter(Morph != 50) %>% 
-  group_by(SID, Morph) %>% 
-  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
-  group_by(Morph) %>% 
-  multi_boot_standard(col = "accuracy") %>% 
-  ungroup()
-
-d_accuracy_block <- 
-  d_trials_block %>% 
-  filter(!is.na(accuracy)) %>% 
-  group_by(SID, block) %>% 
-  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
-  ungroup() %>% 
-  group_by(block) %>% 
-  multi_boot_standard(col = "accuracy") %>% 
-  ungroup()
-
-d_accuracy_block_morph <- 
-  d_trials_block %>% 
-  filter(Morph != 50) %>% 
-  group_by(SID, Morph, block) %>% 
-  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
-  group_by(Morph, block) %>% 
-  multi_boot_standard(col = "accuracy") %>% 
-  ungroup()
-```
-
-```{r include=FALSE}
-#Logistic regression, effect of morph on accuracy, effect of block on accuracy 
-
-log_mod <- 
-  glmer(
-    accuracy ~ morph * age_c + 
-      (morph | SID) + (1 | trial),
-    data = trial_wise_accuracy,  
-    family = "binomial"
-  )
-
-lm_summary <- summary(log_mod)
-
-log_mod_tab <- 
-  lm_summary$coefficients %>% 
-  as.data.frame() %>% 
-  select(
-    Estimate,
-    `Standard Error` = `Std. Error`,
-    `p-value` = `Pr(>|z|)`
-  )
-
-
-```
-
-
-```{r morphaccuracy, fig.cap='Categorization accuracy for each morph level. Error bars are 95 percent confidence intervals.'}
-
-d_accuracy_morph %>% 
-  ggplot(aes(x = Morph, y = mean)) + 
-  geom_line(size = .5) + 
-  geom_pointrange(aes(ymin = ci_lower, ymax = ci_upper)) +
-  geom_hline(yintercept = .5, lty = 2) + 
-  ylim(0,1) + 
-  ylab("Proportion Accurate") + 
-  xlab("Morph level") + 
-  labs(
-    title = "Mean Accuracy by Morph Level"
-  ) +
-  ggthemes::theme_few() +
-  scale_x_continuous(breaks = c(60, 70, 100)) +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_text(size = 16),
-    axis.text = element_text(size = 12)
-  ) 
-```
-
-```{r blockaccuracy, fig.cap="Categorization accuracy for each of four experimental blocks, suggesting that children's accuracy did not degrade throughout the task. Error bars are 95 percent confidence intervals."}
-
-d_accuracy_block %>% 
-  ggplot(aes(block, mean)) +
-  geom_col() +
-  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
-  labs(
-    x = "Block",
-    y = "Mean Accuracy",
-    title = "Mean Accuracy by Test Block"
-  ) +
-  ggthemes::theme_few() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_text(size = 16),
-    axis.text = element_text(size = 12)
-  ) 
-```
-
-
-To validate the manipulation of category ambiguity in my procedure, I first examined whether children's accuracy on the categorization task (i.e., whether they put each item in the correct box) corresponded to the category ambiguity of each stimulus item (Figure \ref{fig:morphaccuracy}). Evidence from pilot testing indicated that children's accuracy on the task was highest for the least ambiguous stimuli, while children were least accurate when categorizing most ambiguous stimuli. To confirm this finding of the effect of morph level on accuracy, I used the following logistic regression model, which accounted for random effects (such as participant and trial number): `accuracy ~ morph * centered age + (morph | participant) + (1 | trial)`. Compared the 60% morph level, the 100% percent morph level was more likely to be accurate ($\beta$ = `r log_mod_tab %>% slice(3) %>% pull(Estimate)`, *p* < .001). The difference in accuracy between trials of morph level 60 and trials of morph level 70 trended towards, but did not reach, significance, $\beta$ = `r log_mod_tab %>% slice(2) %>% pull(Estimate)`, *p* = `r log_mod_tab %>% slice(2) %>% pull("p-value")`. These results demonstrate that the task was more difficult for children when they were tasked with categorizing more ambiguous stimuli. Children's performance on the task also remained consistent throughout the approximately 6 minute duration of test trials (Figure \ref{fig:blockaccuracy}), indicating that children remained engaged and motivated throughout the experiment.
-
-```{r include=FALSE}
-
-trial_viz <- 
-  all_data %>% 
-  group_by(sid, trial) %>% 
-  mutate(
-    trial_time = t - min(t),
-    bin = (trial_time %/% 0.5) * 0.5
-  ) %>% 
-  ungroup() %>% 
-  arrange(bin, sid) %>% 
-  mutate(looking = !is.na(x) & !is.na(y)) %>% 
-  select(trial_time, bin, looking, everything()) 
-
-trial_viz_n <- 
-  trial_viz %>% 
-  group_by(bin, sid, trial) %>% 
-  slice(1) %>% 
-  ungroup() %>% 
-  count(bin)
-
-trial_viz_ci <- 
-  trial_viz %>% 
-  group_by(bin) %>% 
-  multi_boot_standard(col = "looking") %>% 
-  ungroup() %>% 
-  mutate(axis_position = bin + 0.25) %>% 
-  left_join(
-    trial_viz_n,
-    by = c("bin")
-  )
-```
-
-```{r forwardtimecourse, fig.cap='Timecourse of proportion looking at experimenter, in half-second intervals. Size of points indicates amount of trials represented in each point. Error bars are 95 percent confidence intervals.'}
-trial_viz_ci %>% 
-  filter(bin <= 10) %>% 
-  ggplot(aes(axis_position, mean)) +
-  geom_point(aes(size = n)) +
-  geom_line() +
-  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
-  labs(
-    x = "time after beginning of trial (seconds)",
-    y = "mean proportion looking at experimenter",
-    title = "Time course of proportion looking\nat experimenter across trials",
-    size = "Number of trials\nrepresented"
-  ) +
-  scale_x_continuous(breaks = seq(from = 0, to = 10, by = 0.5)) +
-  scale_size_continuous(breaks = seq(from = 700, to = 0, by = -100), range = c(1, 4.5)) +
-  ggthemes::theme_few() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    plot.subtitle = element_text(hjust = 0.5, size = 12),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 8)
-  ) 
-```
-
-
-Since this analysis method required the integration of data acquired from various devices, I examined the average timecourse of children's looking patterns during trials to ensure that data output from these devices was aligning appropriate. Figure \ref{fig:forwardtimecourse} shows, for each half-second interval after the beginning of the trial, the average proportion of that interval that children spent looking at the experimenter. Since the eye-tracking data collection method in this paradigm was coarse, any looks captured by the eye-tracker were considered to be a look in the general direction of the experimenter; thus, the "Area of Interest" in this design was defined as the entire spatial area for which the eye-tracker was calibrated. 
-
-```{r include=FALSE}
-
-#Trial timecourse visualization, backwards from decision
-trial_viz_backwards <-
-  all_data %>% 
-  group_by(sid, trial) %>% 
-  mutate(
-    t_before_decision = t - max(t),
-    time_bin = (t_before_decision %/% 0.5) * 0.5  
-  ) %>% 
-  ungroup() %>% 
-  arrange(time_bin, sid) %>% 
-  mutate(looking = !is.na(x) & !is.na(y)) %>% 
-  select(t_before_decision, time_bin, sid, everything())
-
-trial_viz_n_backwards <- 
-  trial_viz_backwards %>% 
-  group_by(time_bin, sid, trial) %>% 
-  slice(1) %>% 
-  ungroup() %>% 
-  count(time_bin)
-
-trial_viz_ci_backwards <- 
-  trial_viz_backwards %>% 
-  group_by(time_bin) %>% 
-  multi_boot_standard(col = "looking") %>% 
-  ungroup() %>% 
-  mutate(axis_position = time_bin - 0.25) %>% 
-  left_join(
-    trial_viz_n_backwards,
-    by = c("time_bin")
-  )
-
-median_trial_length <- 
-  d_trials %>% 
-  mutate(trial_length = offset - onset) %>% 
-  filter(trial_length > 0) %>% 
-  summarise(median = median(trial_length))
-```
-
-```{r reversetimecourse, fig.cap="Timecourse of children's looking at experimenter prior to decision, in half-second intervals. Size of points represents amount of trials included in each data point. Error bars are 95 percent confidence intervals."}
-
-trial_viz_ci_backwards %>% 
-  filter(time_bin >= -6) %>% 
-  ggplot(aes(axis_position, mean)) +
-  geom_point(aes(size = n)) +
-  geom_line() +
-  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
-  labs(
-    x = "time before decision (seconds)",
-    y = "mean proportion looking at experimenter",
-    title = "Timecourse of children's referencing\nof experimenter prior to decision",
-    size = "Number of trials\nrepresented"
-  ) +
-  scale_size_continuous(
-    breaks = seq(from = 700, to = 0, by = -100), 
-    range = c(1, 4.5)
-  ) +
-  scale_x_continuous(breaks = seq(from = -6, to = 0, by = 0.5)) +
-  ggthemes::theme_few() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    plot.subtitle = element_text(hjust = 0.5, size = 12),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 8)
-  ) 
-
-
-
-```
-
-
-In general, Figure \ref{fig:forwardtimecourse} shows that children tend to look slightly more at the experimenter at the very beginning of the trial, perhaps since this is when they are receiving the stimulus item from the experimenter. As trial length increases, so does the proportion of time in each half-second interval that children spend looking at the experimenter, which may be in part because longer trials frequently featured children asking questions and thus making eye-contact with the experimenter. Figure \ref{fig:reversetimecourse} shows the timecourse of children's looking in half-second intervals before the end of the trial, which corresponds to the child's decision to place the stimulus item in one box or another. This plot shows a peak in children's looking behavior approximately 2.5 - 3 seconds before a decision, which is slightly after the beginning of the trial (median trial length = `r median_trial_length %>% pull(1)` seconds). Taken together, these plots show a plausible timecourse of children's looking throughout trials which lends confirmatory evidence that data from various devices was integrated and aligned correctly.
-
-##Proportion of trial looking by morph
-Did children selectively seek out more social information when trying to categorize more ambiguous stimulus items? I fit the data to a linear mixed-effects model to quantify the effect of category ambiguity on proportion of trial spent looking at the experimenter, along with any possible developmental trends. I ran a linear mixed-effects model with the following preregistered structure: `proportion of trial spent looking ~ morph * centered age + (morph | participant) + (1 | trial)`. This model allowed me to quantify the effects of fixed factors and random factors, including child participants and individual stimulus items. Random effects are denoted in parentheses.
-
-```{r include=FALSE}
 trial_proportions <- 
   all_data %>% 
   filter(!is.na(trial)) %>% 
@@ -680,39 +423,496 @@ trial_proportions <-
     demographics %>% select(SID, age),
     by = c("sid" = "SID")
   ) %>%
-  
   replace_na(list(looking = 0, not_looking = 0)) %>% 
   mutate(prop_looking = looking / (looking + not_looking))
 
-trial_lengths <-  
-  d_trials %>% 
-  mutate(length = offset - onset) %>% 
-  filter(length > 0) %>% 
-  arrange(length)
+all_data_constrained <-  
+  all_data %>% 
+  mutate(
+    x_bin = (x %/% (1920 / 4)) + 1,
+    y_bin = (y %/% (1020 / 3)) + 1,
+    looking = !(is.na(x_bin) 
+                | is.na(y_bin) 
+                | x_bin == 1 
+                | x_bin == 4 
+                | y_bin == 1)
+  )
 
-morph_proportions <- 
-  trial_proportions %>% 
-  group_by(Morph) %>% 
-  multi_boot_standard(col = "prop_looking")
-```
+trial_proportions_constrained <- 
+  all_data_constrained %>% 
+  filter(!is.na(trial)) %>% 
+  group_by(sid, trial) %>% 
+  mutate(
+    trial_length = max(t) - min(t),
+    look_captured = looking
+  ) %>% 
+  mutate(look = case_when(
+    look_captured ~ "looking",
+    !look_captured ~ "not_looking"
+  )) %>% 
+  ungroup() %>% 
+  count(sid, trial, look, Morph) %>% 
+  spread(look, n) %>% 
+  left_join(
+    demographics %>% select(SID, age),
+    by = c("sid" = "SID")
+  ) %>%
+  replace_na(list(looking = 0, not_looking = 0)) %>% 
+  mutate(prop_looking_constrained = looking / (looking + not_looking))
 
-```{r}
-lmer_data <- 
+test_data <- 
   trial_proportions %>% 
   rename(morph = Morph) %>% 
   mutate(
-    morph = factor(morph),
     trial = factor(trial),
     age_c = as.numeric(langcog::scale(age, scale = FALSE))
+  ) %>% 
+  left_join(
+    trial_proportions_constrained %>% 
+      mutate(trial = as.factor(trial)) %>% 
+      select(sid, trial, prop_looking_constrained),
+    by = c("sid", "trial")
+  ) %>% 
+  left_join(
+    d_trials %>%
+      mutate(
+        trial = as.factor(trial),
+        length = offset - onset
+      ) %>%
+      filter(length > 0) %>% 
+      select(SID, trial, accuracy, length, block),
+    by = c("sid" = "SID", "trial")
+  ) %>% 
+  mutate(block = factor(block))
+
+#Define version of data that excludes trials that are extremely long or short
+min_length <- mean(test_data$length) - (2 * sd(test_data$length))
+max_length <- mean(test_data$length) + (2 * sd(test_data$length))
+
+test_data_trimmed <- 
+  test_data %>% 
+  filter(length > min_length & length < max_length)
+
+```
+
+```{r include=FALSE}
+#Accuracy checks.
+
+d_accuracy_morph <- 
+  test_data %>%
+  filter(morph != 50) %>% 
+  group_by(sid, morph) %>% 
+  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
+  group_by(morph) %>% 
+  multi_boot_standard(col = "accuracy") %>% 
+  ungroup()
+
+mean_accuracy_100 <- 
+  d_accuracy_morph %>% 
+  filter(morph == 100) %>% 
+  pull(mean)
+
+d_accuracy_block <- 
+  test_data %>% 
+  filter(!is.na(accuracy)) %>% 
+  group_by(sid, block) %>%
+  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>%
+  ungroup() %>%
+  group_by(block) %>% 
+  multi_boot_standard(col = "accuracy") %>% 
+  ungroup()
+
+d_accuracy_block_morph <- 
+  test_data %>% 
+  filter(morph != 50) %>% 
+  group_by(sid, morph, block) %>% 
+  summarize(accuracy = mean(accuracy, na.rm = TRUE)) %>% 
+  group_by(morph, block) %>% 
+  multi_boot_standard(col = "accuracy") %>% 
+  ungroup()
+
+
+```
+
+```{r include=FALSE}
+#Logistic regression, effect of morph on accuracy, effect of block on accuracy 
+
+log_mod <- 
+  glmer(
+    accuracy ~ morph * age_c + 
+      (1 | sid) + (1 | trial),
+    data = test_data,  
+    family = "binomial"
   )
 
-lmer_data$morph <- relevel(lmer_data$morph, ref = "100")
-  
+lm_summary <- summary(log_mod)
+
+log_mod_tab <- 
+  lm_summary$coefficients %>% 
+  as.data.frame() %>% 
+  select(
+    Estimate,
+    `Standard Error` = `Std. Error`,
+    `p` = `Pr(>|z|)`
+  )
+
+log_mod_block <- 
+  glmer(
+    accuracy ~ block * age_c +
+      (1 | sid) + (1 | trial),
+    data = test_data,
+    family = "binomial"
+  )
+
+lm_block_summary <- summary(log_mod_block)
+
+log_mod_block_tab <- 
+  lm_block_summary$coefficients %>% 
+  as.data.frame() %>% 
+  select(
+    Estimate,
+    `Standard Error` = `Std. Error`,
+    `p` = `Pr(>|z|)`
+  )
+
+log_mod_block_tab_no_int <- 
+  log_mod_block_tab %>% 
+  slice(2:nrow(log_mod_block_tab))
+
+```
+
+```{r morphaccuracy, fig.cap='Categorization accuracy for each morph level. Error bars are 95 percent confidence intervals.'}
+
+d_accuracy_morph %>% 
+  ggplot(aes(x = morph, y = mean)) + 
+  geom_line(size = .5) + 
+  geom_pointrange(aes(ymin = ci_lower, ymax = ci_upper)) +
+  geom_hline(yintercept = .5, lty = 2) + 
+  ylim(0,1) + 
+  ylab("Proportion Accurate") + 
+  xlab("Morph level") + 
+  labs(
+    title = "Mean Accuracy by Morph Level"
+  ) +
+  ggthemes::theme_few() +
+  scale_x_continuous(breaks = c(60, 70, 100)) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12)
+  ) 
+```
+
+```{r accuracytable, results="asis", tab.cap = NULL}
+
+accuracy_tab <- 
+  as.data.frame(lm_summary$coef) %>% 
+  mutate(`Predictor` = c("Intercept", "Morph", "Age", "Morph * Age")) %>% 
+  select(
+    `Predictor`,
+    `Estimate`,
+    "Std. Error" = `Std. Error`,
+    `$z$ value` = `z value`,
+    `$p$ value` = `Pr(>|z|)`
+  )
+
+rownames(accuracy_tab) <- NULL
+
+accuracy_tab %<>% 
+  mutate(
+    stars = ifelse(`$p$ value` > .1, "", 
+                   ifelse(`$p$ value` < .001, "***",
+                          ifelse(`$p$ value` < .01, "**",
+                                 ifelse(`$p$ value` < .05, "*",
+                                        ifelse(`$p$ value` < .1, ".", "Error"))))),
+    
+    `$p$ value` = ifelse(`$p$ value` > .1, round(`$p$ value`, 2), 
+                         ifelse(`$p$ value` < .001, "$<$ .001",
+                                ifelse(`$p$ value` < .01, round(`$p$ value`, 2),
+                                       ifelse(`$p$ value` < .05, round(`$p$ value`, 2),
+                                              ifelse(`$p$ value` < .1, round(`$p$ value`, 2), 
+                                                     "Error")))))
+  )
+
+accuracy_tab <-  
+  accuracy_tab %>% 
+  rename(" " = stars)
+
+print(
+  xtable(
+  accuracy_tab,
+  caption = "Results from logistic regression model predicting children's categorization accuracy."
+  ),
+  caption.placement = "top",
+  sanitize.text.function = function(x){x},
+  include.rownames = FALSE,
+  comment = FALSE
+)
+
+```
+
+
+```{r blockaccuracy, fig.cap="Categorization accuracy for each of four experimental blocks, suggesting that children's accuracy did not degrade throughout the task. Error bars are 95 percent confidence intervals."}
+
+d_accuracy_block %>% 
+  ggplot(aes(block, mean)) +
+  geom_point() +
+  geom_line(aes(group = 1)) +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = "Block",
+    y = "Mean Accuracy",
+    title = "Mean Accuracy by Test Block"
+  ) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12)
+  ) +
+  coord_cartesian(ylim = c(0, 1))
+```
+
+To validate the manipulation of category ambiguity in my procedure, I first examined whether children's accuracy on the categorization task (i.e., whether they put each item in the box of the prototype it was closer to) corresponded to the category ambiguity of each stimulus item (Figure \ref{fig:morphaccuracy}). Evidence from pilot testing indicated that children's accuracy on the task was highest for the least ambiguous stimuli, while children were least accurate when categorizing most ambiguous stimuli. To confirm this finding of the effect of morph level on accuracy, I first tried to fit the following logistic regression model to the data, which accounted for random effects (such as participant and trial number) denoted here and throughout the remainder of this report in parentheses: `accuracy ~ morph * centered age + (morph | participant) + (1 | trial)`. Because this model did not converge, I pruned the model to remove the interaction effect between morph and participant, leaving me with the following model structure: `accuracy ~ morph * centered age + (1 | participant) + (1 | trial)`. 
+
+I found morph to be a significant predictor of children's accuracy such that stimulus items closer to the ends of the perceptual continuum were more likely to be categorized accurately, ($\beta$ = `r log_mod_tab %>% slice(2) %>% pull(Estimate)`, *p* < .001). These results demonstrate that the task was more difficult for children when they were tasked with categorizing more ambiguous stimuli. 
+
+Additionally, as shown in Figure \ref{fig:blockaccuracy}, children's performance on the task remained consistent throughout the approximately 6 minute duration of test trials, indicating that children stayed engaged and motivated throughout the experiment. This is confirmed by the use of a logistic regression model of the structure `accuracy ~ block * centered age + (1 | participant) + (1 | trial)`, which found no significant effects of block on children's accuracy ($p$ values for each level of `block` > `r min(log_mod_block_tab_no_int$p)`).
+
+```{r include=FALSE}
+
+#Visualize timecourse of looking by morph through trials.
+
+trial_viz_morph <- 
+  all_data %>% 
+  group_by(sid, trial, Morph) %>% 
+  mutate(
+    trial_time = t - min(t),
+    bin = (trial_time %/% 0.5) * 0.5
+  ) %>% 
+  ungroup() %>% 
+  arrange(bin, sid, Morph) %>% 
+  mutate(looking = !is.na(x) & !is.na(y)) %>% 
+  select(trial_time, bin, looking, Morph, everything()) 
+
+trial_viz_n_morph <- 
+  trial_viz_morph %>% 
+  group_by(bin, sid, trial, Morph) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  count(bin, Morph)
+
+trial_viz_ci_morph <- 
+  trial_viz_morph %>% 
+  group_by(bin, Morph, sid) %>% 
+  summarize(mean_looking = mean(looking)) %>% 
+  ungroup() %>% 
+  group_by(bin, Morph) %>% 
+  multi_boot_standard(col = "mean_looking") %>% 
+  ungroup() %>% 
+  mutate(axis_position = bin + 0.25) %>% 
+  left_join(
+    trial_viz_n_morph,
+    by = c("bin", "Morph")
+  ) %>% 
+  mutate(morph = as.factor(Morph))
+
+
+```
+
+```{r forwardtimecourse, fig.cap='Timecourse of proportion looking at experimenter, in half-second intervals. Size of points indicates amount of trials represented in each point. Dashed vertical line is median trial length. Error bars are 95 percent confidence intervals.'}
+
+median_trial_length <- 
+  d_trials %>% 
+  mutate(trial_length = offset - onset) %>% 
+  filter(trial_length > 0) %>% 
+  summarise(median = median(trial_length))
+
+trial_viz_ci_morph %>% 
+  filter(bin <= 10) %>% 
+  ggplot(aes(axis_position, mean, color = morph)) +
+  geom_point(aes(size = n), alpha = 0.6) +
+  geom_line() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.1) +
+  labs(
+    x = "time after beginning of trial (seconds)",
+    y = "mean proportion of time\nbin spent looking at experimenter",
+    title = "Timecourse of children's\nreferencing of experimenter",
+    size = "Number of trials\nrepresented"
+  ) +
+  scale_x_continuous(breaks = seq(from = 0, to = 10, by = 0.5)) +
+  scale_size_continuous(
+    breaks = seq(from = 250, to = 0, by = -50), range = c(0.5, 5)
+  ) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 8)
+  ) +
+  coord_cartesian(xlim = c(0, 6), ylim = c(0, 0.6)) +
+  geom_vline(
+    xintercept = median_trial_length %>% pull(median), 
+    linetype = "dashed"
+  )
+```
+
+
+I examined the average timecourse of children's looking patterns during trials to ensure that data output from the eye-tracker was aligning appropriately with video data used to hand-code the onsets and offsets of each trial. Figure \ref{fig:forwardtimecourse} shows, for each half-second interval after the beginning of the trial, the average proportion of that interval that children spent looking at the experimenter, split by morph level (median trial length = `r median_trial_length %>% pull(1)` seconds). Since the eye-tracking data collection method in this paradigm was relatively imprecise due to the in-person interactive setup, any looks captured by the eye-tracker were considered to be a look in the general direction of the experimenter; thus, the "Area of Interest" in this design was defined as the entire spatial area for which the eye-tracker was calibrated. 
+
+```{r include=FALSE}
+
+#Trial timecourse visualization, backwards from decision
+trial_viz_backwards_morph <-
+  all_data %>% 
+  group_by(sid, trial, Morph) %>% 
+  mutate(
+    t_before_decision = t - max(t),
+    time_bin = (t_before_decision %/% 0.5) * 0.5  
+  ) %>% 
+  ungroup() %>% 
+  arrange(time_bin, sid) %>% 
+  mutate(looking = !is.na(x) & !is.na(y)) %>% 
+  select(t_before_decision, time_bin, sid, everything())
+
+trial_viz_n_backwards_morph <- 
+  trial_viz_backwards_morph %>% 
+  group_by(time_bin, sid, trial, Morph) %>% 
+  slice(1) %>% 
+  ungroup() %>% 
+  count(time_bin, Morph)
+
+trial_viz_ci_backwards_morph <- 
+  trial_viz_backwards_morph %>%
+  group_by(time_bin, sid, Morph) %>% 
+  summarize(mean_looking = mean(looking)) %>% 
+  ungroup() %>% 
+  group_by(time_bin, Morph) %>% 
+  multi_boot_standard(col = "mean_looking") %>% 
+  ungroup() %>% 
+  mutate(axis_position = time_bin - 0.25) %>% 
+  left_join(
+    trial_viz_n_backwards_morph,
+    by = c("time_bin", "Morph")
+  ) %>% 
+  mutate(morph = as.factor(Morph))
+
+```
+
+```{r reversetimecourse, fig.cap="Timecourse of children's looking at experimenter prior to decision, in half second intervals. Error bars are 95 percent confidence intervals."}
+
+trial_viz_ci_backwards_morph %>% 
+  filter(time_bin >= -6) %>% 
+  ggplot(aes(axis_position, mean, color = morph)) +
+  geom_point(aes(size = n), alpha = 0.6) +
+  geom_line() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = "time before decision (seconds)",
+    y = "mean proportion of time\nbin spent looking at experimenter",
+    title = "Timecourse of children's referencing\nof experimenter prior to decision",
+    size = "Number of trials\nrepresented"
+  ) +
+  scale_size_continuous(
+    breaks = seq(from = 200, to = 0, by = -50), 
+    range = c(0.5, 5)
+  ) +
+  scale_x_continuous(breaks = seq(from = -6, to = 0, by = 0.5)) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 8)
+  ) +
+  coord_cartesian(ylim = c(0, 0.6)) +
+  geom_vline(
+    xintercept = (-1 * median_trial_length %>% pull(median)),
+    linetype = "dashed"
+  )
+
+
+
+```
+
+In general, Figure \ref{fig:forwardtimecourse} shows that children tend to look slightly more at the experimenter at the very beginning of the trial, perhaps since this is when they are receiving the stimulus item from the experimenter. As trial length increases, so does the proportion of time in each half-second interval that children spend looking at the experimenter, which may be in part because longer trials frequently featured children asking questions and thus making eye-contact with the experimenter. Figure \ref{fig:reversetimecourse} shows the timecourse of children's looking in half-second intervals in relation to the end of the trial, which corresponds to the child's decision to place the stimulus item in one box or another. This plot shows a slight peak in children's looking behavior approximately 2 - 3 seconds before a decision. The general trajectories of children's eye-gaze in Figures \ref{fig:forwardtimecourse} and \ref{fig:reversetimecourse} are similar for all levels of morph, suggesting that differences in stimulus ambiguity did not lead to different patterns of looking during trials (see section on Proportion of Trial Looking by Morph for statistical tests of this result). Taken together, these plots provide some evidence that my data collection method captured a systematic pattern of looking with respect to the onsets and offsets of trials.
+
+##Response Latencies
+
+```{r include=FALSE}
+#response latency mixed model
+maximal_mod_latencies <- 
+  lmerTest::lmer(
+    length ~ morph  * age_c + 
+      (morph | sid) + (1 | trial),
+    data = test_data, REML = FALSE
+  )
+
+latency_summary <- summary(maximal_mod_latencies) 
+
+latency_model_tab <- 
+  latency_summary$coefficients %>% 
+  as.data.frame() %>% 
+  select(
+    Estimate,
+    `Standard Error` = `Std. Error`,
+    `p` = `Pr(>|t|)`
+  )
+
+```
+
+
+```{r latencies, fig.cap="Response latencies (trial length), which did not differ across stimulus items of different morph levels."}
+
+test_data %>% 
+  ggplot(aes(as.factor(morph), length)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 15)) +
+  ggthemes::theme_few() +
+  labs(
+    x = "Morph level",
+    y = "Response latency (seconds)",
+    title = "Response latencies across morph types"
+  ) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12)
+  ) 
+```
+
+I examined the distribution of children's response latencies across each of the four morph conditions as a potential measure of children's uncertainty on the task. Response latency is defined here as the amount of time between the child gaining access to the stimulus item and their action of depositing it in one of the boxes. Figure \ref{fig:latencies} illustrates that there are no obvious differences between the distributions of response latencies for stimuli of different ambiguity levels. To confirm this finding, I used a linear mixed-effects model of the following structure to examine whether morph was related to response latency: `trial_length ~ morph  * centered age + (morph | participant) + (1 | trial)`. I found no effect of morph on response latency ($\beta$ = `r latency_model_tab %>% slice(2) %>% pull(Estimate)`, *p* = `r latency_model_tab %>% slice(2) %>% pull(p)`), indicating that children did not differ in their response latency depending on the ambiguity of the stimulus item they were asked to categorize.
+
+##Proportion of Trial Looking by Morph
+Did children selectively seek out more social information when tasked with categorize more ambiguous stimulus items? I fit the data to a linear mixed-effects model to quantify the effect of category ambiguity on proportion of trial spent looking at the experimenter, along with any possible developmental trends. I first attempted to  fit a linear mixed-effects model with the following preregistered structure: `proportion of trial spent looking ~ morph * centered age + (morph | participant) + (1 | trial)`, with morph as a continuous variable. This model failed to converge, and so was pruned to remove the interaction effect between morph and participant. The resulting model had the following structure: `proportion of trial spent looking ~ morph * centered age + (1 | participant) + (1 | trial)`.
+
+```{r include=FALSE}
+
+morph_proportions <- 
+  test_data %>% 
+  group_by(morph, sid) %>% 
+  summarize(mean_looking = mean(prop_looking, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  group_by(morph) %>% 
+  multi_boot_standard(col = "mean_looking")
+
+morph_proportions_trimmed <- 
+  test_data_trimmed %>% 
+  group_by(morph, sid) %>% 
+  summarize(mean_looking = mean(prop_looking, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  group_by(morph) %>% 
+  multi_boot_standard(col = "mean_looking")
+```
+
+```{r include=FALSE}
+
 maximal_mod <- 
   lmerTest::lmer(
     prop_looking ~ morph  * age_c + 
-      (morph | sid) + (1 | trial),
-    data = lmer_data, REML = FALSE
+      (1 | sid) + (1 | trial),
+    data = test_data, REML = FALSE
   )
   
 g_lm <- summary(maximal_mod)
@@ -725,15 +925,76 @@ morph_model_tab_no_int <-
   morph_model_tab %>%
   slice(2:nrow(morph_model_tab))
 
+morph_mod_no_age <- 
+  lmerTest::lmer(
+    prop_looking ~ morph +
+      (1 | sid) + (1 | trial),
+    data = test_data, REML = FALSE
+  )
+
+g_lm_no_age <- summary(morph_mod_no_age)
+
+morph_model_tab_no_age <- 
+  as.data.frame(g_lm_no_age$coef) %>% 
+  rename(p = `Pr(>|t|)`)
+
 ```
 
-I found no significant effects of stimulus ambiguity or children's centered age in months on the proportion of trial that children spent looking at the experimenter (all *p*-values for fixed effects > `r min(morph_model_tab_no_int$p)`), indicating that children did not selectively look longer at the exprimenter when faced with making a more uncertain decision.
+```{r morphlookingtab, results="asis"}
+
+morph_tab <- 
+  as.data.frame(g_lm$coef) %>% 
+  mutate(`Predictor` = c("Intercept", "Morph", "Age", "Morph * Age")) %>% 
+  select(
+    `Predictor`,
+    `Estimate`,
+    "Std. Error" = `Std. Error`,
+    `$t$ value` = `t value`,
+    `$p$ value` = `Pr(>|t|)`
+  )
+
+rownames(morph_tab) <- NULL
+
+morph_tab %<>% 
+  mutate(
+    stars = ifelse(`$p$ value` > .1, "", 
+                   ifelse(`$p$ value` < .001, "***",
+                          ifelse(`$p$ value` < .01, "**",
+                                 ifelse(`$p$ value` < .05, "*",
+                                        ifelse(`$p$ value` < .1, ".", "Error"))))),
+    
+    `$p$ value` = ifelse(`$p$ value` > .1, round(`$p$ value`, 2), 
+                         ifelse(`$p$ value` < .001, "$<$ .001",
+                                ifelse(`$p$ value` < .01, round(`$p$ value`, 2),
+                                       ifelse(`$p$ value` < .05, round(`$p$ value`, 2),
+                                              ifelse(`$p$ value` < .1, round(`$p$ value`, 2), 
+                                                     "Error")))))
+  )
+
+morph_tab <-  
+  morph_tab %>% 
+  rename(" " = stars)
+
+print(
+  xtable(
+  morph_tab,
+  caption = "Results from linear mixed-effects model predicting the proportion of trial duration children spent looking at the experimenter."
+  ),
+  caption.placement = "top",
+  sanitize.text.function = function(x){x},
+  include.rownames = FALSE,
+  comment = FALSE
+)
+
+
+```
+
 
 ```{r morphlooking, fig.cap="Proportion of trial time spent looking at experimenter by morph level. Error bars are 95 percent confidence intervals."}
 #Visualizing effects of morph on proportion looking
 
 morph_proportions %>% 
-  ggplot(aes(as.factor(Morph), mean)) +
+  ggplot(aes(as.factor(morph), mean)) +
   geom_col() +
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
   labs(
@@ -747,36 +1008,164 @@ morph_proportions %>%
     axis.title = element_text(size = 16),
     axis.text = element_text(size = 12)
   ) 
+
 ```
 
+```{r morphlookingtrimmed, fig.cap="Proportion of trial time spent looking at experimenter by morph level, excluding trials that are 2 standard deviations longer or shorter than the mean trial length. Error bars are 95 percent confidence intervals."}
+
+morph_proportions_trimmed %>% 
+  ggplot(aes(as.factor(morph), mean)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = "Morph level",
+    y = "Proportion of trial looking",
+    title = "Proportion of Trial Spent Looking at Experimenter",
+    subtitle = "Trials which are 2 standard deviations longer\nor shorter than mean trial length are excluded"
+  ) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) 
+```
+
+```{r}
+#Mixed effects models looking at proportion of looking per second per morph
+
+subwindows <- 
+  all_data %>% 
+  group_by(sid, trial, Morph) %>% 
+  mutate(
+    trial_time = t - min(t),
+    sec = (trial_time %/% 1) + 1
+  ) %>% 
+  ungroup() %>% 
+  arrange(sec, sid, Morph) %>% 
+  mutate(looking = !is.na(x) & !is.na(y)) %>% 
+  select(trial_time, sec, looking, Morph, everything()) %>% 
+  mutate(trial = factor(trial)) %>% 
+  group_by(sid, Morph, sec, trial) %>% 
+  summarise(prop_looking = mean(looking)) %>% 
+  filter(sec <= 5) %>% 
+  arrange(sid, trial, sec, Morph) %>% 
+  left_join(
+    test_data %>% select(sid, trial, morph, age_c),
+    by = c("sid", "trial", "Morph" = "morph")
+  ) %>% 
+  rename(morph = `Morph`)
+
+first_sec_mod <- 
+  lmerTest::lmer(
+    prop_looking ~ morph * age_c + 
+      (1| sid) + (1 | trial),
+    data = subwindows %>% filter(sec == 1), REML = FALSE
+  )
+  
+first_sec_summary <- summary(first_sec_mod)
+
+second_sec_mod <- 
+  lmerTest::lmer(
+    prop_looking ~ morph * age_c + 
+      (1| sid) + (1 | trial),
+    data = subwindows %>% filter(sec == 2), REML = FALSE
+  )
+  
+second_sec_summary <- summary(second_sec_mod)
+
+third_sec_mod <- 
+  lmerTest::lmer(
+    prop_looking ~ morph * age_c + 
+      (1| sid) + (1 | trial),
+    data = subwindows %>% filter(sec == 3), REML = FALSE
+  )
+  
+third_sec_summary <- summary(third_sec_mod)
+
+fourth_sec_mod <- 
+  lmerTest::lmer(
+    prop_looking ~ morph * age_c + 
+      (1| sid) + (1 | trial),
+    data = subwindows %>% filter(sec == 4), REML = FALSE
+  )
+  
+fourth_sec_summary <- summary(fourth_sec_mod)
+
+fifth_sec_mod <- 
+  lmerTest::lmer(
+    prop_looking ~ morph * age_c + 
+      (1| sid) + (1 | trial),
+    data = subwindows %>% filter(sec == 5), REML = FALSE
+  )
+  
+fifth_sec_summary <- summary(fifth_sec_mod)
+
+
+```
+
+I found no effect of stimulus ambiguity (morph level) on the proportion of trial that children spent looking at the experimenter ($\beta$ = `r morph_model_tab %>% slice(2) %>% pull(Estimate)`, *p* = `r morph_model_tab %>% slice(2) %>% pull(p)`), indicating that children did not selectively look longer at the exprimenter when faced with a more uncertain decision (Figure \ref{fig:morphlooking}). 
+
+As an exploratory analysis, I removed the age effect and interaction from the model, leaving me with the following model structure: `proportion of trial spent looking ~ morph + (1 | participant) + (1 | trial)`. I again found no effect of morph on proportion of trial duration spent looking ($\beta$ = `r morph_model_tab_no_age %>% slice(2) %>% pull(Estimate)`, *p* = `r morph_model_tab_no_age %>% slice(2) %>% pull(p)`).
+
+To verify that the results were not being skewed by a few extremely long trials, I also visualized the same analysis while excluding trials that were two standard deviations longer or shorter than the mean trial length. The looking pattern across various morph levels when excluding extremely long trials (Figure \ref{fig:morphlookingtrimmed}) is almost identical to the looking pattern observed without excluding any trials (Figure \ref{fig:morphlooking}), indicating that the presence of a few very long trials did not obscure a clearer pattern of referencing based on stimulus category ambiguity.
+
+### Narrowing the Area of Interest
+```{r include=FALSE}
+#Slimming down the AOI for explanatory purposes
+
+maximal_mod_constrained <- 
+  lmerTest::lmer(
+    prop_looking_constrained ~ morph  * age_c + 
+      (1 | sid) + (1 | trial),
+    data = test_data, REML = FALSE
+  )
+  
+g_lm_constrained <- summary(maximal_mod_constrained)
+
+morph_model_tab_constrained <- 
+  as.data.frame(g_lm_constrained$coef) %>% 
+  rename(p = `Pr(>|t|)`)
+
+```
+
+```{r morphconstrained, fig.cap="Proportion of trial time spent looking at experimenter by morph level, constraining the area of interest to the middle half of the calibration area in the horizontal direction and the top two-thirds of the calibration area in the vertical direction. Error bars are 95 percent confidence intervals."}
+
+morph_proportions_constrained <- 
+  trial_proportions_constrained %>% 
+  group_by(sid, Morph) %>% 
+  summarize(mean_looking = mean(prop_looking_constrained, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  group_by(Morph) %>% 
+  multi_boot_standard(col = "mean_looking")
+
+morph_proportions_constrained %>% 
+  ggplot(aes(as.factor(Morph), mean)) +
+  geom_col() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
+  labs(
+    x = "Morph level",
+    y = "Proportion of trial looking",
+    title = "Proportion of Trial Spent Looking at Experimenter\n(Constrained Area of Interest)"
+  ) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12)
+  ) 
+```
+
+As an exploratory analysis, I narrowed the dimensions of the area-of-interest (AOI) to only include looks to the middle half of the calibration area (in the horizontal direction) and in the top two-thirds of the calibration area (in the vertical direction) in the analysis (Figure \ref{fig:morphconstrained}). I used a linear mixed-effects model with the same structure as the previous analysis and found no effect of morph level on proportion of trial duration children spent looking to the experimenter within the constrained area of interest ($\beta$ = `r morph_model_tab_constrained %>% slice(2) %>% pull(Estimate)`, *p* = `r morph_model_tab_constrained %>% slice(2) %>% pull(p)`).
 
 ```{r include=FALSE}
 #Effect of accuracy on looking time
 
-accuracy_proportions <- 
-  all_data %>% 
-  filter(!is.na(trial) & !is.na(accuracy)) %>%
-  group_by(sid, trial) %>% 
-   mutate(
-    trial_length = max(t) - min(t),
-    look_captured = !is.na(x) | !is.na(y)
-  ) %>% 
-  mutate(look = case_when(
-    look_captured ~ "looking",
-    !look_captured ~ "not_looking"
-  )) %>% 
-  ungroup() %>% 
-  count(sid, trial, look, accuracy) %>% 
-  spread(look, n) %>% 
-  left_join(
-    demographics %>% select(SID, age),
-    by = c("sid" = "SID")
-  ) %>%
-  replace_na(list(looking = 0, not_looking = 0)) %>% 
-  mutate(prop_looking = looking / (looking + not_looking))
-
+#Make a new data frame that removes the completely ambiguous morphs, which can be neither accurate nor inaccurate
 lmer_acc_data <- 
-  accuracy_proportions %>% 
+  test_data %>% 
+  filter(morph != 50) %>% 
   mutate(
     accuracy = factor(accuracy),
     trial = factor(trial),
@@ -795,16 +1184,20 @@ g_lm_acc <- summary(maximal_mod_acc)
 accuracy_model_table <- 
   g_lm_acc$coefficients %>% 
   as.data.frame() %>% 
-  rename(`p-value` = `Pr(>|t|)`)
+  rename(`p` = `Pr(>|t|)`)
 
 ```
 
-```{r accuracylooking, fig.cap="Proportion of trials spent looking at experimenter by children's category accuracy. Error bars are 95 percent confidence intervals."}
+```{r accuracylooking, fig.cap="Proportion of time during trials spent looking at experimenter by children's category accuracy. Error bars are 95 percent confidence intervals."}
 #Visualizing proportion of trial looking by accuracy
 
-accuracy_proportions %>% 
+test_data %>% 
+  filter(!is.na(accuracy)) %>% 
+  group_by(accuracy, sid) %>%
+  summarise(mean_looking = mean(prop_looking, na.rm = TRUE)) %>% 
+  ungroup() %>% 
   group_by(accuracy) %>% 
-  multi_boot_standard(col = "prop_looking") %>% 
+  multi_boot_standard(col = "mean_looking") %>% 
   ungroup %>% 
   ggplot(aes(accuracy, mean)) +
   geom_col() +
@@ -822,28 +1215,153 @@ accuracy_proportions %>%
   ) 
 ```
 
-##Proportion of trial looking by task accuracy
-I also examined whether children's accuracy on the task had an effect on the proportion of trials spent looking at the experimenter (Figure \ref{fig:accuracylooking}). To answer this question, I used a linear mixed-effects model with the following structure, with random effects denoted in parentheses: `proportion of trial spent looking ~ accuracy * centered age + (accuracy | participant) + (1 | trial)`. I found no effect of accuracy on proportion of trials spent looking at the experimenter (*p* = `r accuracy_model_table %>% slice(2) %>%  pull("p-value")`), indicating that children did not look at the experimenter more on trials when they were inaccurate versus inaccurate.
+## Proportion of Trial Looking by Task Accuracy
+I also examined whether children's accuracy on the task was related to the proportion of time during trials children spent looking at the experimenter (Figure \ref{fig:accuracylooking}). To answer this question, I used a linear mixed-effects model with the following structure: `proportion of trial spent looking ~ accuracy * centered age + (accuracy | participant) + (1 | trial)`. I found no effect of accuracy on proportion of time during trials spent looking at the experimenter ($\beta$ = `r accuracy_model_table %>% slice(2) %>% pull(Estimate)`, *p* = `r accuracy_model_table %>% slice(2) %>%  pull(p)`), indicating that children overall did not look at the experimenter more on trials when they were inaccurate versus accurate.
+
+```{r accuracylookingtab, results="asis"}
+accuracy_mod_tab <- 
+  as.data.frame(g_lm_acc$coef) %>% 
+  mutate(`Predictor` = c("Intercept", "Accuracy (True)", "Age", "Morph * Age")) %>% 
+  select(
+    `Predictor`,
+    `Estimate`,
+    "Std. Error" = `Std. Error`,
+    `$t$ value` = `t value`,
+    `$p$ value` = `Pr(>|t|)`
+  )
+
+rownames(accuracy_mod_tab) <- NULL
+
+accuracy_mod_tab %<>% 
+  mutate(
+    stars = ifelse(`$p$ value` > .1, "", 
+                   ifelse(`$p$ value` < .001, "***",
+                          ifelse(`$p$ value` < .01, "**",
+                                 ifelse(`$p$ value` < .05, "*",
+                                        ifelse(`$p$ value` < .1, ".", "Error"))))),
+    
+    `$p$ value` = ifelse(`$p$ value` > .1, round(`$p$ value`, 2), 
+                         ifelse(`$p$ value` < .001, "$<$ .001",
+                                ifelse(`$p$ value` < .01, round(`$p$ value`, 2),
+                                       ifelse(`$p$ value` < .05, round(`$p$ value`, 2),
+                                              ifelse(`$p$ value` < .1, round(`$p$ value`, 2), 
+                                                     "Error")))))
+  )
+
+accuracy_mod_tab <-  
+  accuracy_mod_tab %>% 
+  rename(" " = stars)
+
+print(
+  xtable(
+  accuracy_mod_tab,
+  caption = "Results from linear mixed-effects model predicting the proportion of trial duration children spent looking at the experimenter from trial accuracy."
+  ),
+  caption.placement = "top",
+  sanitize.text.function = function(x){x},
+  include.rownames = FALSE,
+  comment = FALSE
+)
+
+```
+
+```{r accuracylookingmorph, fig.cap="Proportion of trial duration spent looking at the experimenter, by morph level and accuracy. When categorizing items of morph level 100 (exact prototypes), children who were inaccurate tended to look at the experimenter more."}
+accuracy_morph_n <- 
+  d_trials %>% 
+  count(accuracy, Morph)
+
+test_data %>% 
+  filter(!is.na(accuracy)) %>% 
+  group_by(sid, morph, accuracy) %>% 
+  summarize(mean_looking = mean(prop_looking, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  group_by(morph, accuracy) %>% 
+  multi_boot_standard(col = "mean_looking") %>% 
+  ungroup() %>% 
+  left_join(
+    accuracy_morph_n,
+    by = c("morph" = "Morph", "accuracy")
+  ) %>% 
+  ggplot(aes(morph, mean, color = accuracy)) +
+  geom_point(aes(size = n)) +
+  geom_line() +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.5) +
+  labs(
+    x = "Morph level",
+    y = "Average proportion of trial\nspent looking at experimenter",
+    title = "Proportion of Trial Spent Looking\nat Experimenter by Accuracy and Morph",
+    size = "Number of trials\nrepresented"
+  ) +
+  scale_x_continuous(breaks = c(60, 70, 100)) +
+  ggthemes::theme_few() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12)
+  ) +
+  coord_cartesian(ylim = c(0, .32))
+
+```
+
+```{r include=FALSE}
+
+lmer_acc_data_proto <- 
+  lmer_acc_data %>% 
+  filter(morph == 100)
+
+maximal_mod_acc_proto <- 
+  lmerTest::lmer(
+    prop_looking ~ accuracy * age_c + 
+      (accuracy | sid) + (1 | trial),
+    data = lmer_acc_data_proto, REML = FALSE
+  )
+
+maximal_mod_proto_summary <- summary(maximal_mod_acc_proto)
+
+proto_summary_tab <- 
+  maximal_mod_proto_summary$coefficients %>% 
+  as.data.frame() %>% 
+  select(
+    Estimate,
+    `Standard Error` = `Std. Error`,
+    `p` = `Pr(>|t|)`
+  )
+
+```
+
+Figure \ref{fig:accuracylookingmorph} shows an exploratory analysis that illustrates an interesting trend: on trials of morph level 100, children who categorized the item incorrectly seemed to look more at the experimenter than those who categorized the item correctly. To confirm the presence of this pattern, I used the same linear mixed-effects model as described above to determine whether accuracy is related to the proportion of trial duration that children spent looking at the experimenter, but I limited the analyses to trials of morph level 100. When the model was restricted to these morph-level-100 trials, I found that children looked at the experimenter for a significantly higher proportion of the trial when categorizing the items inaccurately versus accurately ($\beta$ = `r proto_summary_tab %>% slice(2) %>% pull(Estimate)`, *p* = `r proto_summary_tab %>% slice(2) %>% pull(p)`). However, this result should be interpreted with caution, since there were relatively very few trials in which participants inaccurately categorized stimuli of morph level 100 (n = `r accuracy_morph_n %>% slice(3) %>% pull(n)`).
+
 
 # Discussion
 
-In this study, I set out to understand whether children are sensitive to graded levels of uncertainty, and whether they would adjust their social-information seeking on the basis of this uncertainty. Previous research had suggested that children explore environments in order to maximize their learning about the world [@schulz2007serious], that they have a limited but emerging capacity to monitor epistemic states and uncertainty [@hembacher2014don; @coughlin2015introspection], and that they selectively seek out information from people who they deem to be knowledgeable and helpful in the immediate learning context [@kushnir2013can; @vredenburgh2016young]. Empirical evidence also suggested that children may possess some sensitivity to graded evidence and intermediate levels of uncerainty in the environment, in such contexts as "partial exposure" tasks [@call2001apes; @kloo2017direct] and word learning situations [@hembacherchildren]. Thus, I hypothesized that children would show a looking pattern that would indicate sensitivity to graded uncertainty, and would selectively seek more social information on trials in which they were tasked with categorizing more ambiguous stimuli. 
+In this study, I set out to understand whether children are sensitive to graded levels of uncertainty, and whether they would adjust their social-information seeking on the basis of this uncertainty. Previous research suggested that, while young children typically fail uncertainty monitoring tests that require explicit or verbal responses [@markman1977realizing; @flavell1981development], they explore environments in order to maximize their learning about the world [@schulz2007serious] and ask questions in order to extract useful information from knowledgeable social partners [@chouinard2007children]. These seemingly conflicting findings indicate that children's uncertainty monitoring capacities can be observed through spontaneous information-seeking behaviors before children can explicitly report on these capacities.
 
-Contrary to my hypothesis, I found that children did not differentiate between trials of different morph levels in their levels of looking. A linear mixed-effects model demonstrated that stimlus ambiguity had no effect at any level of ambiguity on the proportion of each trial that children spent looking at the experimenter. Thus the data do not explicitly show that children possess sensitivity to graded levels of uncertainty, nor do they show that children strategically adjust the amount of social information they seek out on the basis of subjective uncertainty. Interestingly, I found no difference in looking behaviors even between trials which were completely ambiguous (morph level 50) and trials which were identical to the prototypes shown to children at the beginning of each experimental block (morph level 100). This result is particularly striking given that children were significantly less accurate in categorizing more ambiguous items, indicating that task difficulty was not uniform across trials. This finding contrasts that of Hembacher, deMayo, and Frank [-@hembacherchildren], who found that, in a word-learning task, children's social information gathering was closely linked to referential ambiguity. What might be the origin of the discrepancy between these two findings?
 
-One possibility is that this task, even during the most unambiguous trials, was more challenging for children, since the task required keeping the protoype images and their correct locations in memory. Thus, even though children's differential levels of accuracy on the various trial types indicate that the task was not uniformly difficult across all trials, it may have been too demanding throughout all the trials to be able to invoke a pattern of differential looking. Another possibility is that the task proceeded too swiftly to facilitate children's looking at the experimenter during individual trials. Other studies that have measured children's visual solicitations for social information [e.g., @vaish2011thirteen] have measured children's looking patterns over longer spans of time, whereas my design measured children's looking patterns during trials that had a median length of `r median_trial_length %>% pull(1)` seconds. Below, I discuss methodological limitations of the current work that may have impacted my ability to detect an effect of graded category ambiguity on children's social information-gathering.
+Indeed, several studies have shown that, beginning in infancy, children seek out information in ways that seem to be driven by uncertainty [@goupil2016infants; @vaish2011thirteen]. Of particular interest to the current work, several studies have shown children's engagement in selective information-gathering when other people are the source of disambiguating information. When children seek information from the social world, the resulting interactions seem to reflect that the child is sensitive to their own uncertainty; moreover, prior research suggests that they leverage this sensitivity in order to strategically reference others when they need information, and do so less when they do not need information [@kushnir2013can; @vredenburgh2016young].  
+
+While prior work has shown that children spontaneously seek out social information on the basis of epistemic uncertainty, I aimed here to understand more about the relationship between children's social-information gathering and their sensitivity to graded levels of uncertainty. Empirical evidence has suggested that children may possess some sensitivity to graded evidence and intermediate levels of uncerainty in the environment, in such contexts as "partial exposure" tasks [@call2001apes; @kloo2017direct] and word learning situations [@hembacherchildren]. Overall, however, very little is known about children's sensitivity to graded levels of uncertainty. It could be that children only show differential levels of spontaneous information-seeking from the social world when faced with situations of complete certainty versus complete ignorance. 
+
+Several aspects of this study design differ from previous research which investigated children's social information-gathering and uncertainty monitoring. Although this type of live-eye tracking paradigm has been used in numerous studies, particularly those investigating social gaze patterns in children with autism, it is still exceedingly rare among empirical research in developmental psychology. My principal motivation for using this eye-tracking setup here was to obtain information about the duration of children's gaze shifts to a social partner in a continuous interaction, which is difficult to quantify solely through a hand-coding mechanism. Moreover, to my knowledge, children's uncertainty as it relates to graded category ambiguity has not been previously investigated. In the current study, asking children to categorize ambiguous stimuli allowed me to experimentally induce conditions of graded uncertainty. 
+
+Given existing evidence of children's sensitivity to their own uncertainty, and their tendency to adjust their social interactions to selectively seek out information when faced with uncertainty, I hypothesized here that children would show a looking pattern that would indicate sensitivity to graded uncertainty, and would selectively seek more social information on trials in which they were tasked with categorizing more ambiguous stimuli. Contrary to my hypothesis, I found that children did not differentiate between trials of different morph levels in their amount of looking to the experimenter. A linear mixed-effects model demonstrated that stimlus ambiguity had no effect on the proportion of each trial that children spent looking at the experimenter. Thus, the data do not explicitly show that children possess sensitivity to graded levels of uncertainty, nor do they show that children strategically adjust the amount of social information they seek out on the basis of subjective uncertainty. If either of these constructs were visible in the data, then I would have observed a larger proportion of trial time spent looking at the experimenter when the stimulus items were more ambiguous. I did find a small difference in looking behaviors when children were categorizing the most unambiguous stimuli, such that children looked longer when they categorized these items incorrectly than they did when they categorized them correctly. I have no strong hypothesis as to why this trend appears in the data, although it may be related to the fact that children who categorized these items incorrectly were overall more uncertain during the task, and therefore engaged with the experimenter more often to ask for help. Regardless of the explanation for this finding, I encourage interpreting it with caution, since such a small number of children miscategorized the morph-100 level stimuli.
+
+Interestingly, I also found no difference in looking behaviors even between trials which were completely ambiguous (morph level 50) and trials which were identical to the prototypes shown to children at the beginning of each experimental block (morph level 100). This result is particularly striking given that children were significantly less accurate in categorizing more ambiguous items, indicating that task difficulty was not uniform across trials. This finding contrasts that of Hembacher, deMayo, and Frank [-@hembacherchildren], who found that, in a word-learning task, children's social information gathering was closely linked to referential ambiguity. What might be the origin of the discrepancy between these two findings?
+
+One possibility is that in this task, given the novelty and peculiarity of the stimulus items, children found the most fruitful source of disambiguating information to be the stimulus items themselves, as opposed to an experimenter seated across from them who gave no feedback on their performance. In this study, children may have found that looking at the images of the stimuli could be potentially useful towards the goal of accurately categorizing them. Conversely, in the paradigm used by Hembacher, et al. [-@hembacherchildren], it was unlikely that extensive visual examination of two completely novel objects would yield any helpful clues to the child as to which of the objects was the referent of a novel label that they had just heard produced moments before. Thus, children may have been seeking visual information from other, more informative sources than the experimenter's face in this task.
+
+Another possibility is that the task proceeded too swiftly to facilitate children's looking at the experimenter during individual trials. Other studies that have examined children's visual sampling for social information [e.g., @vaish2011thirteen] have measured children's looking patterns over longer spans of time, whereas my design measured children's looking patterns during trials that had a median length of `r median_trial_length %>% pull(1)` seconds. Below, I discuss the broader methodological limitations of the current work that may have impacted my ability to detect an effect of graded category ambiguity on children's social information-gathering.
 
 ##Limitations
 
-The current work has several limitations that should encourage caution against interpreting this null result as an indication of children's inability to monitor graded levels of category uncertainty and seek out social information accordingly. First and foremost, my data collection method -- the use of an eye-tracker to measure children's gaze patterns in a live person-to-person interaction -- provided coarse data. This type of eye-tracking method is challenging to execute because it requires children to be very still during an extended calibration phase, and is particularly sensitive to children's body movements and any small fluctuations in the experimental setup. Future work should strive for greater precision from this type of data-collection method. Furthermore, as mentioned above, this task moved quickly; a task that proceeds a slower pace may be optimize the researcher's ability to detect an effect of category ambiguity on children's social gaze patterns. 
+The current work has several limitations that should encourage caution against interpreting this null result as an indication of children's inability to monitor graded levels of category uncertainty and seek out social information accordingly. First and foremost, my data collection method -- the use of an eye-tracker to measure children's gaze patterns in a live person-to-person interaction -- provided imprecise data that only allowed me to make a rough estimate of whether or not the child was looking at the experimenter. This type of eye-tracking method is challenging to execute because it requires children to be very still during an extended calibration phase, and is particularly sensitive to children's body movements and any small fluctuations in the experimental setup. Future work should strive for greater precision from this type of data-collection method. Furthermore, as mentioned above, this task moved quickly; a task that proceeds a slower pace may optimize the researcher's ability to detect an effect of category ambiguity on children's social gaze patterns. 
 
-Additionally, it is not possible to know with complete certainty what type of information children were seeking or expecting when they shifted their gaze to the experimenter. I operate under the assumption that children's foremost reason for looking was a search for disambiguating information, but children may also have looked at the experimenter because they were expecting a certain action (i.e., being handed the next item in the game), asking a question unrelated to their own uncertainty, or were simply compelled to look at their social partner because faces are interesting to look at. 
+Additionally, it is not possible to know with complete certainty what type of information children were seeking or expecting when they shifted their gaze to the experimenter. I operate under the assumption that children's foremost reason for looking was a search for disambiguating information, but children may also have looked at the experimenter because they were expecting a certain action (i.e., being handed the next item in the game), asking a question unrelated to their own uncertainty, or were simply compelled to look at their social partner because faces are interesting to look at and particularly salient in social scenes. 
 
-Finally, this study was performed with a convenience sample of children from a preschool in an upper-middle/upper class neighborhood consisting of mostly white and Asian families. Since this sample is not demographically representative of the broader population, it is possible that some of the eye-gaze patterns I observed were sample-specific, given that eye contact between social partners has been shown to be modulated by cultural norms (@akechi2013attention). Nevertheless, the preschool from which I recruited this sample makes a concerted effort to reach out to underrepresented families in order to maintain a diverse classroom environment.
+Finally, this study was performed with a convenience sample of children from a preschool in an upper-middle/upper class neighborhood consisting of mostly white and Asian families. Since this sample is not demographically representative of the broader population, it is possible that some of the eye-gaze patterns I observed were sample-specific, given that eye contact between social partners has been shown to be modulated by cultural norms [@akechi2013attention]. Nevertheless, the preschool from which I recruited this sample makes a concerted effort to reach out to underrepresented families in order to maintain a diverse classroom environment.
 
 ## Conclusion and Future Work
 
-The results of the current study do not provide a conclusive answer to the question I posed at the outset of whether children are sensitive to graded levels of uncertainty and adjust their social information-gathering according to this uncertainty. Contrary to my initial hypothesis, children did not show differential levels of looking to the experimenter when categorizing items whose category ambiguity varied along a spectrum. However, this could have been a task-specific result given the pace and difficulty of the procedure children were being asked to complete. Future work can improve on this design by allowing for a larger temporal observation window through which to gauge children's social-information gathering, removing some of the memory demands present throughout this task to exagerrate the difference between "difficult" and "easy" trial items, and by implementing a method of tracking gaze to a social partner in a more precise manner than what was achieved here. 
+The results of the current study do not provide a conclusive answer to the question I posed at the outset of whether children are sensitive to graded levels of uncertainty and adjust their social information-gathering according to this uncertainty. Contrary to my initial hypothesis, children did not show differential levels of looking to the experimenter when categorizing items whose category ambiguity varied along a spectrum. However, this could have been a task-specific result given the pace and novelty of the procedure children were being asked to complete. Future work can improve on this design by allowing for a larger temporal observation window through which to gauge children's social-information gathering, removing some of the memory demands present throughout this task to exagerrate the difference between "difficult" and "easy" trial items, and by implementing a method of tracking gaze to a social partner in a more precise manner than what was achieved here. 
 
 In sum, the current work illustrates that, in a category-discrimination context, children do not show obvious signs of adjusting their social-information gathering behaviors on the basis of graded uncertainty. However, the possibility still exists that children do possess a sensitivity to intermediate levels of category ambiguity, and would show this sensitivity in different contexts. This study therefore provides a theoretical and methodological framework from which other researchers can expand in order to better understand the development of children's uncertainty monitoring and social information-seeking in early childhood.
 
