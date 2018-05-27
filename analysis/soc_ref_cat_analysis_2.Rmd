@@ -101,17 +101,21 @@ d_trials <-
 
 read.smi.idf <- function(file.name) {
   d <- 
-    read_tsv(
+    read.table(
     file.name, 
-    comment = "##"
+    sep = "\t", 
+    header = TRUE, 
+    fill = TRUE,
+    comment.char = "#"
+
     ) %>% 
     filter(Type == "SMP") %>% 
     select(
       t = Time,
-      lx = "L POR X [px]",
-      rx = "R POR X [px]",
-      ly = "L POR Y [px]",
-      ry = "R POR Y [px]"
+      lx = "L.POR.X..px.",
+      rx = "R.POR.X..px.",
+      ly = "L.POR.Y..px.",
+      ry = "R.POR.Y..px."
     ) %>% 
     mutate(sid = str_extract(file.name, "\\d{6}_\\d{2}"))
 }
@@ -959,6 +963,38 @@ test_data <-
       select(SID, trial, accuracy, length),
     by = c("sid" = "SID", "trial")
   )
+
+```
+```{r}
+#Mixed effects models looking at proportion of looking per second per morph
+
+subwindows <- 
+  all_data %>% 
+  group_by(sid, trial, Morph) %>% 
+  mutate(
+    trial_time = t - min(t),
+    sec = (trial_time %/% 1) + 1
+  ) %>% 
+  ungroup() %>% 
+  arrange(sec, sid, Morph) %>% 
+  mutate(looking = !is.na(x) & !is.na(y)) %>% 
+  select(trial_time, sec, looking, Morph, everything()) %>% 
+  group_by(sid, Morph, sec, trial) %>% 
+  summarise(mean_looking = mean(looking)) %>% 
+  filter(sec <= 5) %>% 
+  arrange(sid, trial, sec, Morph) %>% 
+  
+
+first_sec_mod <- 
+  lmerTest::lmer(
+    prop_looking ~ morph * age_c + 
+      (morph | sid) + (1 | trial),
+    data = subwindows %>% filter(sec == 1), REML = FALSE
+  )
+  
+g_lm <- summary(maximal_mod)
+
+
 
 ```
 

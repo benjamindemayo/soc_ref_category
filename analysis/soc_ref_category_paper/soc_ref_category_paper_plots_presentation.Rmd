@@ -135,7 +135,7 @@ Building off the findings discussed above, the current study used a categorizati
 
 A categorization task was used here in part because category learning is a critical learning context in early childhood. Young children possess many mechanisms that facilitate category learning, including sensitivity to statistical regularities in the environment [@saffran1996statistical], sensitivity towards correlations of shared attributes among objects [@younger1985segregation], and acute attention to perceptual features such as shape [@imai1994children]. Selectively seeking social information on the basis of graded uncertainty could be another such mechanism that aids in children's category learning.  It is an open question whether children seek out disambiguating evidence when there is less evidence for an object's category membership.
 
-Eye-tracking technology was used in this study to allow me to measure the duration of children's looks to the experimenter with greater precision than that afforded by hand-coding. Typically, research in social cognition that uses eye-tracking (particularly when it involves children) measures children's gaze patterns on a digital stimulus display such as a television screen which shows still or moving images  [@gredeback2009eye]. This is partially due to the fact that live-eye tracking with both children and adults is more difficult than using conventional eye-tracking displays. Nevertheless, some research suggests that social looking behaviors may differ slightly when a participant is engaged in a real social interaction as opposed to viewing a screen image of the same interaction [@risko2012social].  One study in particular suggests that an interaction with a live conversant draws more social gaze than a video display of a similar interaction, simply because a live conversation creates the potential for social interaction in ways that videos cannot [@laidlaw2011potential]. A separate line of research also shows that children learn more effectively when interacting with a social partner whose actions are contingent on the child's actions, as compared to watching a video of a person acting as a teacher [@troseth2006young; @roseberry2014skype]. As a result, it may be that children shift gaze to a socially contingent partner in a different way than they would to a prerecorded social partner who does not actually interact with the child.
+Eye-tracking technology was used in this study to allow me to measure the duration of children's looks to the experimenter with greater precision than that afforded by hand-coding. Typically, research in social cognition that uses eye-tracking (particularly when it involves children) measures children's gaze patterns on a digital stimulus display such as a television screen which shows still or moving images  [@gredeback2009eye]. This is partially due to the fact that live-eye tracking with both children and adults is more difficult than using conventional eye-tracking displays. Nevertheless, some research suggests that social looking behaviors may differ slightly when a participant is engaged in a real social interaction as opposed to viewing a screen image of the same interaction [@risko2012social].  One study in particular suggests that an interaction with a live conversant draws more social gaze than a video display of a similar interaction, simply because a live conversation creates the potential for social interaction in ways taht videos cannot [@laidlaw2011potential]. A separate line of research also shows that children learn more effectively when interacting with a social partner whose actions are contingent on the child's actions, as compared to watching a video of a person acting as a teacher [@troseth2006young; @roseberry2014skype]. As a result, it may be that children shift gaze to a socially contingent partner in a different way than they would to a prerecorded social partner who does not actually interact with the child.
 
 Despite the methodological challenges associated with live eye tracking, its use with children and infants is not unprecedented. This technique has mostly been used to examine social gaze irregularities in children with Autism Spectrum Disorder (ASD), and has been used with children of preschool and primary school age [@noris2012investigating; @falck2015eye; @nadig2010does]. At least one study has also extended this type of eye-tracking to typically-developing infants. Gredeback, Fikke, and Melinder examined the development of infants' gaze-following behaviors between 2 and 8 months using a live eye-tracking paradigm [-@gredeback2010development]. In this study, infants began showing gaze-following behaviors between 2 to 4 months of age, and were more likely to follow the gaze of a stranger than the gaze of their mother. 
 
@@ -581,7 +581,7 @@ log_mod_block_tab_no_int <-
 
 ```
 
-```{r morphaccuracy, fig.cap='Categorization accuracy for each morph level. Error bars are 95 percent confidence intervals.'}
+```{r morphaccuracy, fig.cap='Categorization accuracy for each morph level. Error bars are 95 percent confidence intervals.', fig.height=12, fig.width=15}
 
 d_accuracy_morph %>% 
   ggplot(aes(x = morph, y = mean)) + 
@@ -597,10 +597,11 @@ d_accuracy_morph %>%
   ggthemes::theme_few() +
   scale_x_continuous(breaks = c(60, 70, 100)) +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_text(size = 16),
-    axis.text = element_text(size = 12)
+    plot.title = element_text(hjust = 0.5, size = 40),
+    axis.title = element_text(size = 36),
+    axis.text = element_text(size = 28)
   ) 
+
 ```
 
 ```{r accuracytable, results="asis", tab.cap = NULL}
@@ -652,7 +653,7 @@ print(
 ```
 
 
-```{r blockaccuracy, fig.cap="Categorization accuracy for each of four experimental blocks, suggesting that children's accuracy did not degrade throughout the task. Error bars are 95 percent confidence intervals."}
+```{r blockaccuracy, fig.cap="Categorization accuracy for each of four experimental blocks, suggesting that children's accuracy did not degrade throughout the task. Error bars are 95 percent confidence intervals.", fig.width=15, fig.height=12}
 
 d_accuracy_block %>% 
   ggplot(aes(block, mean)) +
@@ -666,9 +667,9 @@ d_accuracy_block %>%
   ) +
   ggthemes::theme_few() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_text(size = 16),
-    axis.text = element_text(size = 12)
+   plot.title = element_text(hjust = 0.5, size = 40),
+    axis.title = element_text(size = 36),
+    axis.text = element_text(size = 28)
   ) +
   coord_cartesian(ylim = c(0, 1))
 ```
@@ -720,7 +721,7 @@ trial_viz_ci_morph <-
 
 ```
 
-```{r forwardtimecourse, fig.cap='Timecourse of proportion looking at experimenter, in half-second intervals. Size of points indicates amount of trials represented in each point. Dashed vertical line is median trial length. Error bars are 95 percent confidence intervals.'}
+```{r forwardtimecourse, fig.cap='Timecourse of proportion looking at experimenter, in half-second intervals. Size of points indicates amount of trials represented in each point. Dashed vertical line is median trial length. Error bars are 95 percent confidence intervals.', fig.width=17, fig.height=11}
 
 median_trial_length <- 
   d_trials %>% 
@@ -736,20 +737,23 @@ trial_viz_ci_morph %>%
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.1) +
   labs(
     x = "time after beginning of trial (seconds)",
-    y = "mean proportion of time in \n time bin spent looking at experimenter",
+    y = "mean proportion of time\nbin spent looking at experimenter",
     title = "Timecourse of children's\nreferencing of experimenter",
     size = "Number of trials\nrepresented"
   ) +
   scale_x_continuous(breaks = seq(from = 0, to = 10, by = 0.5)) +
   scale_size_continuous(
-    breaks = seq(from = 250, to = 0, by = -50), range = c(0.5, 5)
+    breaks = seq(from = 250, to = 0, by = -50), range = c(2, 10)
   ) +
   ggthemes::theme_few() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    plot.subtitle = element_text(hjust = 0.5, size = 12),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 8)
+    plot.title = element_text(hjust = 0.5, size = 40),
+    plot.subtitle = element_text(hjust = 0.5, size = 20),
+    axis.title = element_text(size = 36),
+    axis.text = element_text(size = 28),
+    legend.text = element_text(size = 24),
+    legend.title = element_text(size = 28),
+    legend.key.size = unit(0.5, "inches")
   ) +
   coord_cartesian(xlim = c(0, 6), ylim = c(0, 0.6)) +
   geom_vline(
@@ -810,7 +814,7 @@ trial_viz_ci_backwards_morph %>%
   geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.2) +
   labs(
     x = "time before decision (seconds)",
-    y = "mean proportion of time in\n time bin spent looking at experimenter",
+    y = "mean proportion of time\nbin spent looking at experimenter",
     title = "Timecourse of children's referencing\nof experimenter prior to decision",
     size = "Number of trials\nrepresented"
   ) +
@@ -990,7 +994,7 @@ print(
 ```
 
 
-```{r morphlooking, fig.cap="Proportion of trial time spent looking at experimenter by morph level. Error bars are 95 percent confidence intervals."}
+```{r morphlooking, fig.cap="Proportion of trial time spent looking at experimenter by morph level. Error bars are 95 percent confidence intervals.", fig.width=15, fig.height=12}
 #Visualizing effects of morph on proportion looking
 
 morph_proportions %>% 
@@ -1004,9 +1008,9 @@ morph_proportions %>%
   ) +
   ggthemes::theme_few() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_text(size = 16),
-    axis.text = element_text(size = 12)
+    plot.title = element_text(hjust = 0.5, size = 40),
+    axis.title = element_text(size = 36),
+    axis.text = element_text(size = 28)
   ) 
 
 ```
@@ -1265,7 +1269,7 @@ print(
 
 ```
 
-```{r accuracylookingmorph, fig.cap="Proportion of trial duration spent looking at the experimenter, by morph level and accuracy. When categorizing items of morph level 100 (exact prototypes), children who were inaccurate tended to look at the experimenter more."}
+```{r accuracylookingmorph, fig.cap="Proportion of trial duration spent looking at the experimenter, by morph level and accuracy. When categorizing items of morph level 100 (exact prototypes), children who were inaccurate tended to look at the experimenter more.", fig.height=12, fig.width=19}
 accuracy_morph_n <- 
   d_trials %>% 
   count(accuracy, Morph)
@@ -1295,11 +1299,17 @@ test_data %>%
   scale_x_continuous(breaks = c(60, 70, 100)) +
   ggthemes::theme_few() +
   theme(
-    plot.title = element_text(hjust = 0.5, size = 18),
-    axis.title = element_text(size = 16),
-    axis.text = element_text(size = 12)
+    plot.title = element_text(hjust = 0.5, size = 40),
+    axis.title = element_text(size = 36),
+    axis.text = element_text(size = 28),
+    legend.text = element_text(size = 24),
+    legend.title = element_text(size = 28),
+    legend.key.size = unit(0.5, "inches")
   ) +
-  coord_cartesian(ylim = c(0, .32))
+  coord_cartesian(ylim = c(0, .32)) +
+  scale_size_continuous(
+    breaks = seq(from = 250, to = 0, by = -50), range = c(2, 10)
+  ) 
 
 ```
 
