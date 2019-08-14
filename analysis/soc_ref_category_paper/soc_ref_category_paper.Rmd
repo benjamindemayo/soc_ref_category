@@ -40,7 +40,7 @@ output            : papaja::apa6_pdf
 ---
 
 ```{r load_packages, include = FALSE}
-library("papaja")
+library(papaja)
 library(psych)
 library(langcog)
 library(tidyverse)
@@ -49,18 +49,13 @@ library(magrittr)
 library(lmerTest)
 library(broman)
 library(xtable)
+library(fs)
 
-example_file <- "../raw_data/020218_01-eye_data Samples.txt"
+#example_file <- "../raw_data/020218_01-eye_data Samples.txt"
+#example_trial_file <- "../trial_data/020218_01.csv"
 
-example_trial_file <- "../trial_data/020218_01.csv"
+source(path(here::here(), "file_paths.R")) #reads in externally-defined file paths
 
-demographics_sheet <- "../soc_ref_cat_demo_github.csv"
-
-key <- "../trial_morphs.csv"
-
-experiment_setup_path <- "../images/setup.jpg"
-
-stimulus_objects_a <- "..images/setAstimuli.png"
 
 ```
 
@@ -77,7 +72,9 @@ Below, I review prior research that demonstrates children's capacities to engage
 
 ```{r schematic, fig.align="center", fig.cap="Schematic representation of theoretical background and prior research informing the current study."}
 
-knitr::include_graphics("../images/diagram_lit_review_1.jpg")
+knitr::include_graphics(
+  path(project_root, "images", "diagram_lit_review_1.jpg")
+)
 
 ```
 
@@ -148,30 +145,44 @@ In sum, since prior research indicated that such a live eye-tracking approach wa
 I developed the experimental procedure descibed below over a 5-week pilot testing period. During this period, I recruited 40 child participants at the Children's Discovery Museum in San Jose, CA who participated in various preliminary versions of the task. The primary purpose of pilot testing was to arrive at a version of the test that (a) showed levels of accuracy on the task that indicated differential levels of uncertainty for children, and (b) kept children engaged and (c) was enjoyable to them. Several facets of the experimental design were adjusted throughout the pilot-testing process, including the color of the stimuli, the number of trials, the presenation of motivational rewards (stickers) throughout the task, and whether children had visual access to prototype images of stimuli they were being asked to categorized during test trials.
 
 ```{r include=FALSE}
-# Read in trial data.
-
+# read in trial data
 demographics <- read_csv(demographics_sheet)
+
+#get rid of participants to exclude
 include <- 
   demographics %>% 
   filter(Exclude == "n") 
 
+#read in trial key
 trial_key <- read_csv(key)
 
+#initialize data frame for trial-level data
 d_trials <- data_frame()
-files <- dir("../trial_data")
+
+#make list of files with trial data in them
+files <- dir_ls(path = path(project_root, "data", "trial_data"))
 
 for (f in files) {
   
-  subj_id <- str_replace(f, ".csv", "")
+  #reg exp operations to extract subject id into character vector
+  subj_id <- 
+    f %>% 
+    str_replace(".csv", "") %>% 
+    str_replace(".*(?=\\d{6})", "") 
+  #replace all characters before six digits in a row with empty string
   
+  #get the condition for the child
   condition <- 
     demographics %>% 
     filter(`SID` == subj_id) %>% 
     pull("Condition")
 
-  jf <- paste("../trial_data/", f, sep = "")
-  jd <- read_csv(jf)
+  #jf <- paste("../trial_data/", f, sep = "")
+  
+  jd <- read_csv(f)
+  
   id <- 
+    #establish new tibble with trial information
     tibble(
       SID = subj_id, 
       trial = jd$Trial.Number,  
@@ -186,8 +197,8 @@ for (f in files) {
       webcam_length = jd$extcam_length.onset[1] / 1000,
       onset = onset + camera_lag,
       offset = offset + camera_lag
-
     )
+  
   d_trials <- bind_rows(d_trials, id)
   
 }
@@ -195,24 +206,24 @@ for (f in files) {
 d_trials <- 
   d_trials  %>%
   left_join(
-    demographics %>% select(SID, Condition),
+    demographics %>% select(SID, Condition), #merge this new tibble with condition info
     by = c("SID")
   ) %>%
   left_join(
     trial_key,
-    by = c("trial" = "Trial", "Condition")
+    by = c("trial" = "Trial", "Condition") 
   ) %>%
-  mutate(
+  mutate( #create an accuracy column
     accuracy = case_when(
        correct_side == "M" ~ NA,
        correct_side != "M" ~ correct_side == chosen_side
     )
    ) %>%
   left_join(
-    demographics %>% select(SID, age),
+    demographics %>% select(SID, age), #add in the child's age
     by = "SID"
   ) %>% 
-  mutate(
+  mutate( #create a new column with the test block info
     block = case_when(
       1 <= trial & trial <= 7 ~ 1,
       8 <= trial & trial <= 14 ~ 2,
@@ -221,6 +232,7 @@ d_trials <-
     )
   )
 
+#calculate the mean age in the sample
 mean_age <- 
   demographics %>% 
   filter(`Exclude` == "n") %>% 
@@ -235,7 +247,9 @@ I recruited a sample of 37 children aged 3 to 5 years (mean age = `r mean_age`) 
 
 ```{r stimuli, fig.align="center", fig.cap="Stimulus sets provided to children. Images on the ends of the spectrums are prototypes which morph into each other on a perceptual continuum."}
 
-knitr::include_graphics("../images/stimuli_1.png")
+knitr::include_graphics(
+  path(project_root, "images", "stimuli_1.png")
+)
 
 ```
 
@@ -246,7 +260,9 @@ Stimuli were slightly altered versions of those created by Havy and Waxman (2016
 
 ```{r setup, fig.height=6, fig.width=8, fig.cap="Experimental setup from child's perspective. The eye-tracker across the table recorded gaze shifts to the experimenter throughout the task."}
 
-knitr::include_graphics("../images/setup.jpg")
+knitr::include_graphics(
+  path(project_root, "images", "setup.jpg")
+)
 
 ```
 
@@ -255,7 +271,10 @@ Children were seated in a small chair in front of a table which contained two bo
 I used an SMI REDn corneal reflection eye-tracker to measure children's gaze shifts to the experimenter throughout the task. The eye-tracking device was placed on two magnetic mounts in the middle of the table, approximately 58 centimeters in front of the child. The child's field of vision was captured by an external-viewing webcam situated directly behind and slightly above the child's head. 
 
 ```{r calibration, fig.cap="Calibration display. During the calibration phase, children were directed to look at each image as the experimenter approved each calibration point one by one."}
-knitr::include_graphics("../images/calibration.jpg")
+
+knitr::include_graphics(
+  path(project_root, "images", "calibration.jpg")
+)
 
 ```
 
@@ -272,17 +291,17 @@ Each session was videotaped on a camera behind the experimenter's seat, allowing
 
 
 ```{r include=FALSE}
-#This function reads in data that end in .txt
+
+#This function reads in data that end in .txt and selects the relevant columns
 
 read.smi.idf <- function(file.name) {
   d <- 
     read.table(
-    file.name, 
-    sep = "\t", 
-    header = TRUE, 
-    fill = TRUE,
-    comment.char = "#"
-
+      file.name, 
+      sep = "\t", 
+      header = TRUE, 
+      fill = TRUE,
+      comment.char = "#"
     ) %>% 
     filter(Type == "SMP") %>% 
     select(
@@ -315,7 +334,7 @@ preprocess.data <- function(d, x.max = 1920, y.max=1080, samp.rate = 30) {
       ly = if_else(ly <= 0 | ly >= y.max, NA_real_, ly)
     )
 
-  #Take one eye if we only have one; otherwise average them
+  #Take one eye's measurements if we only have one; otherwise average them
     d <-
       d %>%
       mutate(
@@ -345,12 +364,10 @@ preprocess.data <- function(d, x.max = 1920, y.max=1080, samp.rate = 30) {
 ```{r include=FALSE}
 #Read in Experiment data and preprocess.
 
-raw.data.path <- "../raw_data/"
-processed.data.path <- "../processed_data/"
 
 ## LOOP TO READ IN FILES
 all_data <- data_frame()
-files <- dir(raw.data.path,pattern = "*.txt")
+files <- dir_ls(raw.data.path) #initialize list of files to loop through
 
 to.n <- function(x) {as.numeric(as.character(x))}
 sem <- function(x) {sd(x) / sqrt(length(x))}
@@ -370,7 +387,7 @@ for (file.name in files) {
   print(exp_trials)
 
   ## these are the two functions that are most meaningful
-  d <- read.smi.idf(str_c(raw.data.path, file.name, sep = ""))
+  d <- read.smi.idf(file.name)
   d <- preprocess.data(d, x.max = 1920, y.max = 1080, samp.rate = 30) 
   
 
@@ -395,7 +412,7 @@ for (file.name in files) {
   all_data <- bind_rows(all_data, d_trial)
 }
 
-write_csv(all_data, path = paste0(processed.data.path, "socref_cat_data.csv"))
+write_csv(all_data, path = processed_data_file)
 ```
 # Results
 
