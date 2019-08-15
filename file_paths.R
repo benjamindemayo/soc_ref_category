@@ -29,3 +29,6 @@ processed_data_directory <- path(project_root, "data", "processed_data")
 processed_data_file <- 
   path(project_root, "data", "processed_data", "socref_cat_data.csv")
 
+#bibliography
+bib <- path(project_root, "analysis", "soc_ref_category_bib.bib")
+

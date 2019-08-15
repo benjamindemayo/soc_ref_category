@@ -1,0 +1,262 @@
+---
+title: "soc_ref_category_data_prep"
+author: "Benny deMayo"
+date: "8/15/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This document prepares the eye-tracking data for analyses performed in the final paper.
+
+```{r load_packages, include = FALSE}
+library(papaja)
+library(psych)
+library(langcog)
+library(tidyverse)
+library(stringr)
+library(magrittr)
+library(lmerTest)
+library(broman)
+library(xtable)
+library(fs)
+
+source(path(here::here(), "file_paths.R")) #reads in externally-defined file paths
+
+```
+
+
+```{r analysis_preferences}
+# Seed for random number generation
+set.seed(42)
+```
+
+
+```{r include=FALSE}
+# read in trial data
+demographics <- read_csv(demographics_sheet)
+
+#get rid of participants to exclude
+include <- 
+  demographics %>% 
+  filter(Exclude == "n") 
+
+#read in trial key
+trial_key <- read_csv(key)
+
+#initialize data frame for trial-level data
+d_trials <- data_frame()
+
+#make list of files with trial data in them
+files <- dir_ls(path = path(project_root, "data", "trial_data"))
+
+for (f in files) {
+  
+  #reg exp operations to extract subject id into character vector
+  subj_id <- 
+    f %>% 
+    str_replace(".csv", "") %>% 
+    str_replace(".*(?=\\d{6})", "") 
+  #replace all characters before six digits in a row with empty string
+  
+  #get the condition for the child
+  condition <- 
+    demographics %>% 
+    filter(`SID` == subj_id) %>% 
+    pull("Condition")
+
+  #jf <- paste("../trial_data/", f, sep = "")
+  
+  jd <- read_csv(f)
+  
+  id <- 
+    #establish new tibble with trial information
+    tibble(
+      SID = subj_id, 
+      trial = jd$Trial.Number,  
+      onset = jd$Trial.onset / 1000,  
+      offset = jd$Trial.offset / 1000,
+      chosen_side = jd$Trial.side
+    ) %>%
+    mutate(
+      camera_onset = jd$camera.onset[1] / 1000,
+      webcam_onset = jd$webcam.onset[1] / 1000,
+      camera_lag = webcam_onset - camera_onset,
+      webcam_length = jd$extcam_length.onset[1] / 1000,
+      onset = onset + camera_lag,
+      offset = offset + camera_lag
+    )
+  
+  d_trials <- bind_rows(d_trials, id)
+  
+}
+
+d_trials <- 
+  d_trials  %>%
+  left_join(
+    demographics %>% select(SID, Condition), #merge this new tibble with condition info
+    by = c("SID")
+  ) %>%
+  left_join(
+    trial_key,
+    by = c("trial" = "Trial", "Condition") 
+  ) %>%
+  mutate( #create an accuracy column
+    accuracy = case_when(
+       correct_side == "M" ~ NA,
+       correct_side != "M" ~ correct_side == chosen_side
+    )
+   ) %>%
+  left_join(
+    demographics %>% select(SID, age), #add in the child's age
+    by = "SID"
+  ) %>% 
+  mutate( #create a new column with the test block info
+    block = case_when(
+      1 <= trial & trial <= 7 ~ 1,
+      8 <= trial & trial <= 14 ~ 2,
+      15 <= trial & trial <= 21 ~ 3,
+      22 <= trial & trial <= 28 ~ 4
+    )
+  )
+
+#calculate the mean age in the sample
+mean_age <- 
+  demographics %>% 
+  filter(`Exclude` == "n") %>% 
+  pull(age) %>% 
+  mean()
+```
+
+```{r include=FALSE}
+
+#This function reads in data that end in .txt and selects the relevant columns
+
+read.smi.idf <- function(file.name) {
+  d <- 
+    read.table(
+      file.name, 
+      sep = "\t", 
+      header = TRUE, 
+      fill = TRUE,
+      comment.char = "#"
+    ) %>% 
+    filter(Type == "SMP") %>% 
+    select(
+      t = Time,
+      lx = "L.POR.X..px.",
+      rx = "R.POR.X..px.",
+      ly = "L.POR.Y..px.",
+      ry = "R.POR.Y..px."
+    ) %>% 
+    mutate(sid = str_extract(file.name, "\\d{6}_\\d{2}"))
+}
+```
+
+```{r include=FALSE}
+################################################################################
+## PREPROCESS DATA 
+## take data file with l and r, x and y, as well as stimulus, average
+## eyes, do whatever preprocessing needs to be done. 
+################################################################################
+
+preprocess.data <- function(d, x.max = 1920, y.max=1080, samp.rate = 30) {
+
+  #Remove out of range looks
+    d <- 
+    d %>% 
+    mutate(
+      rx = if_else(rx <= 0 | rx >= x.max, NA_real_, rx),
+      lx = if_else(lx <= 0 | lx >= x.max, NA_real_, lx),
+      ry = if_else(ry <= 0 | ry >= y.max, NA_real_, ry),
+      ly = if_else(ly <= 0 | ly >= y.max, NA_real_, ly)
+    )
+
+  #Take one eye's measurements if we only have one; otherwise average them
+    d <-
+      d %>%
+      mutate(
+        x = case_when(
+          is.na(rx) & !is.na(lx) ~ lx,
+          !is.na(rx) & is.na(lx) ~ rx,
+          !is.na(rx) & !is.na(lx) ~ (rx + lx) / 2,
+          is.na(rx) & is.na(lx) ~ NA_real_
+        ),
+        y = case_when(
+          is.na(ry) & !is.na(ly) ~ ly,
+          !is.na(ry) & is.na(ly) ~ ry,
+          !is.na(ry) & !is.na(ly) ~ (ry + ly) / 2,
+          is.na(ry) & is.na(ly) ~ NA_real_
+        )
+      ) %>%
+      select(
+        -rx, -ry, -lx, -ly
+      ) %>%
+      mutate(
+        t = round((d$t - d$t[1])/(1000000), 3),
+        y = y.max - y
+      )
+}
+```
+
+```{r include=FALSE}
+#Read in Experiment data and preprocess.
+
+
+## LOOP TO READ IN FILES
+all_data <- data_frame()
+files <- dir_ls(raw.data.path) #initialize list of files to loop through
+
+to.n <- function(x) {as.numeric(as.character(x))}
+sem <- function(x) {sd(x) / sqrt(length(x))}
+
+a <-  0
+for (file.name in files) {
+  a = a + 1
+}
+
+for (file.name in files) {
+  ## print file name, so if loop breaks, we know where
+  print(file.name)
+  exp_trials <-
+    d_trials %>%
+    filter(SID == str_extract(file.name, "\\d{6}_\\d{2}"))
+  
+  print(exp_trials)
+
+  ## these are the two functions that are most meaningful
+  d <- read.smi.idf(file.name)
+  d <- preprocess.data(d, x.max = 1920, y.max = 1080, samp.rate = 30) 
+  
+
+  calibration_time <- d$t[nrow(d)] - exp_trials$webcam_length[1]
+
+  d %<>% 
+    mutate(t = t - calibration_time) %>% 
+    filter(t >= 0)
+  
+  d_trial <- 
+    exp_trials %>%
+    split(.$trial) %>%
+    map_df(function(trial_row) {
+      this_trial <- 
+        filter(d, t >= trial_row$onset, t < trial_row$offset) %>%
+        mutate(trial = trial_row$trial) %>%
+        left_join(trial_row)
+      return(this_trial)
+    })
+  
+  ## now here's where data get bound together
+  all_data <- bind_rows(all_data, d_trial)
+}
+
+all_data %>% 
+  write_csv(
+    path(project_root, "data", "processed_data", "socref_cat_data.csv")
+  )
+
+
+```
